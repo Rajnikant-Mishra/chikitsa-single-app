@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import userRepository from "../Admin/admin.repository.js";
+import userRepository from "./admin.repository.js";
 
 class AuthService {
   async register(data) {

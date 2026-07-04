@@ -1,6 +1,6 @@
 // src/repositories/inventory.repository.js
 
-import Inventory from "../InventoryAssets/asset.model.js";
+import Inventory from "./asset.model.js";
 
 class InventoryRepository {
   async create(data) {

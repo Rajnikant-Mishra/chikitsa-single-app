@@ -7,9 +7,9 @@ import { fileURLToPath } from 'url';
 
 
 
-import auth from "./Modules/Admin/admin.routes.js";
-import Inventory from './Modules/InventoryAssets/asset.routes.js';
-import rentalRoutes from "./modules/rentalmaster/master.routes.js";
+import auth from "./Modules/admin/admin.routes.js";
+import Inventory from './Modules/inventoryAssets/asset.routes.js';
+import rentalRoutes from "./Modules/rentalmaster/master.routes.js";
 
 
 
