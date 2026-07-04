@@ -1,5 +1,5 @@
-import Rental from "../Modules/rentalmaster/master.model.js";
-import Inventory from "./inventoryAssets/asset.model.js";
+import Rental from "./rentalmaster/master.model.js";
+import Inventory from "./inventoryassets/asset.model.js";
 
 Rental.belongsTo(Inventory, {
   foreignKey: "inventory_id",

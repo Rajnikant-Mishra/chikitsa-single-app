@@ -3,7 +3,7 @@
 import {
   Rental,
   Inventory,
-} from "../../Modules/associations.js";
+} from "../associations.js";
 
 class RentalRepository {
   async create(data) {
