@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 
 import auth from "./modules/admin/admin.routes.js";
 import Inventory from './modules/inventoryassets/asset.routes.js';
-import rentalRoutes from "./modules/rentalmaster/master.routes.js";
+import rentalRoutes from "./modules/rentalmaster/master.routes.js";  
 
 
 
