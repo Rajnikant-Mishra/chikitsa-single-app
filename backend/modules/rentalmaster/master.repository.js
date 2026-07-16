@@ -1,49 +1,98 @@
-// import Rental from "./master.model.js";
-// import Inventory from "../InventoryAssets/asset.model.js";
-import {
-  Rental,
-  Inventory,
-} from "../associations.js";
+import Rental from "./master.model.js";
+import Device from "../device/device.model.js";
+import CareCenter from "../carecenter/carecenter.model.js"; // Import your CareCenter model
 
 class RentalRepository {
+  // ==========================
+  // Create Rental
+  // ==========================
   async create(data) {
     return await Rental.create(data);
   }
 
-async findAll() {
+  // ==========================
+  // Get All Rentals (With eager loaded relations)
+  // ==========================
+  async findAll() {
     return await Rental.findAll({
       include: [
         {
-          model: Inventory,
-          as: "inventory",
+          model: Device,
+          as: "device",
           attributes: [
-            "inventory_id",
-            "device_model",
-            "serial_number",
-            "accessories",
+            "device_id",
+            "device_name",
+            "status",
           ],
         },
+        {
+          model: CareCenter,
+          as: "careCenter", // Assumes you defined: Rental.belongsTo(CareCenter, { foreignKey: 'care_center_id', as: 'careCenter' })
+          attributes: [
+            "carecenter_id",
+            "carecenter_name",
+            "address",
+            "mobile_number",
+            "alternative_mobile_number"
+          ]
+        }
       ],
       order: [["rental_id", "DESC"]],
     });
   }
 
-  async findById(rental_id) {
-    return await Rental.findByPk(rental_id);
+  // ==========================
+  // Get Rental By ID
+  // ==========================
+  async findById(id) {
+    return await Rental.findByPk(id, {
+      include: [
+        {
+          model: Device,
+          as: "device",
+          attributes: [
+            "device_id",
+            "device_name",
+            "status",
+          ],
+        },
+        {
+          model: CareCenter,
+          as: "careCenter",
+          attributes: [
+            "carecenter_id",
+            "carecenter_name",
+            "address",
+            "mobile_number",
+            "alternative_mobile_number"
+          ]
+        }
+      ],
+    });
   }
 
-  async update(rental_id, data) {
-    const rental = await Rental.findByPk(rental_id);
+  // ==========================
+  // Update Rental
+  // ==========================
+  async update(id, data) {
+    const rental = await Rental.findByPk(id);
 
-    if (!rental) return null;
+    if (!rental) {
+      return null;
+    }
 
     return await rental.update(data);
   }
 
-  async delete(rental_id) {
-    const rental = await Rental.findByPk(rental_id);
+  // ==========================
+  // Delete Rental
+  // ==========================
+  async delete(id) {
+    const rental = await Rental.findByPk(id);
 
-    if (!rental) return null;
+    if (!rental) {
+      return false;
+    }
 
     await rental.destroy();
 

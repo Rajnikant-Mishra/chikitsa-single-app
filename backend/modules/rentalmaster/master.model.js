@@ -10,10 +10,20 @@ const Rental = sequelize.define(
       primaryKey: true,
     },
 
-    inventory_id: {
+    device_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      comment: "Selected device/serial number",
+      references: {
+        model: "devices",
+        key: "device_id",
+      },
+      onUpdate: "CASCADE",
+      onDelete: "RESTRICT",
+    },
+
+    record_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
     },
 
     login_date: {
@@ -26,13 +36,13 @@ const Rental = sequelize.define(
       allowNull: true,
     },
 
-    delivery_executive: {
-      type: DataTypes.STRING(100),
+    recall_date: {
+      type: DataTypes.DATEONLY,
       allowNull: true,
     },
 
     billing_type: {
-      type: DataTypes.ENUM("Daily", "Monthly"),
+      type: DataTypes.ENUM("Daily", "Monthly", "Fort Night"),
       allowNull: false,
     },
 
@@ -51,8 +61,24 @@ const Rental = sequelize.define(
       defaultValue: 0,
     },
 
-    care_center_name: {
-      type: DataTypes.STRING(200),
+    care_center_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: "carecenters",
+        key: "carecenter_id",
+      },
+      onUpdate: "CASCADE",
+      onDelete: "SET NULL",
+    },
+
+    mob_no: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+    },
+
+    alternative_mob_no: {
+      type: DataTypes.STRING(20),
       allowNull: true,
     },
 
@@ -67,6 +93,11 @@ const Rental = sequelize.define(
     },
 
     care_poc_name: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+
+    care_referal: {
       type: DataTypes.STRING(100),
       allowNull: true,
     },
@@ -86,6 +117,11 @@ const Rental = sequelize.define(
       allowNull: true,
     },
 
+    patient_alternative_mob_no: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+    },
+
     patient_attendant_name: {
       type: DataTypes.STRING(100),
       allowNull: true,
@@ -96,19 +132,10 @@ const Rental = sequelize.define(
       allowNull: true,
     },
 
-    asset_photo: {
-      type: DataTypes.STRING,
+    asset_photos: {
+      type: DataTypes.JSON,
       allowNull: true,
-    },
-
-    prescription_photo: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-
-    remarks: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+      defaultValue: [],
     },
 
     status: {
@@ -117,7 +144,7 @@ const Rental = sequelize.define(
         "Delivered",
         "Running",
         "Returned",
-        "Closed"
+        "Closed",
       ),
       defaultValue: "Pending",
     },
@@ -126,7 +153,7 @@ const Rental = sequelize.define(
     tableName: "rental_master",
     timestamps: true,
     underscored: true,
-  }
+  },
 );
 
 export default Rental;

@@ -1,37 +1,73 @@
 import express from "express";
-import rentalController from "./master.controller.js";
+
+import {
+  createRental,
+  getAllRentals,
+  getRentalById,
+  updateRental,
+  deleteRental,
+} from "./master.controller.js";
+
 import { auth } from "../../middleware/auth.middleware.js";
 import upload from "../../middleware/upload.js";
 
 const router = express.Router();
 
+// =========================
+// CREATE RENTAL
+// =========================
 router.post(
-  "/", auth(["admin"]),
-   upload.fields([
-    { name: "asset_photo", maxCount: 1 },
-    { name: "prescription_photo", maxCount: 1 },
+  "/",
+  auth(["admin"]),
+  upload.fields([
+    {
+      name: "asset_photos",
+      maxCount: 10,
+    },
   ]),
-  rentalController.create
+  createRental
 );
 
+// =========================
+// GET ALL RENTALS
+// =========================
 router.get(
-  "/", auth(["admin"]),
-  rentalController.getAll
+  "/",
+  auth(["admin"]),
+  getAllRentals
 );
 
+// =========================
+// GET RENTAL BY ID
+// =========================
 router.get(
-  "/:id", auth(["admin"]),
-  rentalController.getById
+  "/:id",
+  auth(["admin"]),
+  getRentalById
 );
 
+// =========================
+// UPDATE RENTAL
+// =========================
 router.put(
-  "/:id", auth(["admin"]),
-  rentalController.update
+  "/:id",
+  auth(["admin"]),
+  upload.fields([
+    {
+      name: "asset_photos",
+      maxCount: 10,
+    },
+  ]),
+  updateRental
 );
 
+// =========================
+// DELETE RENTAL
+// =========================
 router.delete(
-  "/:id", auth(["admin"]),
-  rentalController.delete
+  "/:id",
+  auth(["admin"]),
+  deleteRental
 );
 
 export default router;

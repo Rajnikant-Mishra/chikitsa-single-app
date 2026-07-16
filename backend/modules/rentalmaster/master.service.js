@@ -1,44 +1,54 @@
 import rentalRepository from "./master.repository.js";
 
 class RentalService {
+  // ==========================
+  // Create Rental
+  // ==========================
   async createRental(data) {
     return await rentalRepository.create(data);
   }
 
+  // ==========================
+  // Get All Rentals
+  // ==========================
   async getAllRentals() {
     return await rentalRepository.findAll();
   }
 
-  async getRentalById(rental_id) {
-    const rental = await rentalRepository.findById(rental_id);
+  // ==========================
+  // Get Rental By ID
+  // ==========================
+  async getRentalById(id) {
+    const rental = await rentalRepository.findById(id);
 
     if (!rental) {
-      throw new Error("Rental not found");
+      throw new Error("Rental record not found.");
     }
 
     return rental;
   }
 
-  async updateRental(rental_id, data) {
-    const rental = await rentalRepository.update(
-      rental_id,
-      data
-    );
+  // ==========================
+  // Update Rental
+  // ==========================
+  async updateRental(id, data) {
+    const rental = await rentalRepository.update(id, data);
 
     if (!rental) {
-      throw new Error("Rental not found");
+      throw new Error("Rental record not found.");
     }
 
     return rental;
   }
 
-  async deleteRental(rental_id) {
-    const deleted = await rentalRepository.delete(
-      rental_id
-    );
+  // ==========================
+  // Delete Rental
+  // ==========================
+  async deleteRental(id) {
+    const deleted = await rentalRepository.delete(id);
 
     if (!deleted) {
-      throw new Error("Rental not found");
+      throw new Error("Rental record not found.");
     }
 
     return true;

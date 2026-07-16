@@ -1,16 +1,15 @@
-// src/controllers/inventory.controller.js
+import referenceService from "./reference.service.js";
 
-import inventoryService from "./asset.service.js";
-
-class InventoryController {
+class ReferenceController {
   async create(req, res) {
     try {
-      const inventory =
-        await inventoryService.createInventory(req.body);
+      const reference =
+        await referenceService.createReference(req.body);
 
       return res.status(201).json({
         success: true,
-        data: inventory,
+        message: "Reference created successfully.",
+        data: reference,
       });
     } catch (error) {
       return res.status(400).json({
@@ -20,16 +19,14 @@ class InventoryController {
     }
   }
 
-
-
   async getAll(req, res) {
     try {
-      const inventories =
-        await inventoryService.getAllInventories();
+      const references =
+        await referenceService.getAllReferences();
 
       return res.status(200).json({
         success: true,
-        data: inventories,
+        data: references,
       });
     } catch (error) {
       return res.status(500).json({
@@ -41,14 +38,14 @@ class InventoryController {
 
   async getById(req, res) {
     try {
-      const inventory =
-        await inventoryService.getInventoryById(
+      const reference =
+        await referenceService.getReferenceById(
           req.params.id
         );
 
       return res.status(200).json({
         success: true,
-        data: inventory,
+        data: reference,
       });
     } catch (error) {
       return res.status(404).json({
@@ -60,15 +57,16 @@ class InventoryController {
 
   async update(req, res) {
     try {
-      const inventory =
-        await inventoryService.updateInventory(
+      const reference =
+        await referenceService.updateReference(
           req.params.id,
           req.body
         );
 
       return res.status(200).json({
         success: true,
-        data: inventory,
+        message: "Reference updated successfully.",
+        data: reference,
       });
     } catch (error) {
       return res.status(400).json({
@@ -80,13 +78,13 @@ class InventoryController {
 
   async delete(req, res) {
     try {
-      await inventoryService.deleteInventory(
+      await referenceService.deleteReference(
         req.params.id
       );
 
       return res.status(200).json({
         success: true,
-        message: "Inventory deleted successfully",
+        message: "Reference deleted successfully.",
       });
     } catch (error) {
       return res.status(404).json({
@@ -97,4 +95,4 @@ class InventoryController {
   }
 }
 
-export default new InventoryController();
+export default new ReferenceController();
