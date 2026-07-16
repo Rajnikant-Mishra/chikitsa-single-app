@@ -6,6 +6,7 @@ import ForgotPassword from "./components/Auth/ForgotPassword";
 import Inventorylist from "./components/inventory/InventoryList";
 import RentalMaster from "./components/rentalMaster/RentalMasterList";
 import RentalMasterForm from "./components/rentalMaster/RentalMasterForm";
+import RentalMasterView from "./components/rentalMaster/RentalMasterView";
 
 function App() {
   return (
@@ -18,7 +19,8 @@ function App() {
 
         <Route path="/inventory" element={<Inventorylist />} />
         <Route path="/rental-master" element={<RentalMaster />} /> 
-        <Route path="/rental-master-form" element={<RentalMasterForm />} />
+        <Route path="/rental-requisition" element={<RentalMasterForm />} /> 
+        <Route path="/rental-view" element={<RentalMasterView />} />
       </Routes>
     </Router>
   );

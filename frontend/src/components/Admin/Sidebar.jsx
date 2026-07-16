@@ -221,24 +221,24 @@ const NAV_ITEMS = [
     path: "/rental-master",
     group: "WORKSPACE",
   },
+  // {
+  //   label: "Log New Requisition",
+  //   icon: PlusSquare,
+  //   path: "/rental-master-form",
+  //   group: "WORKSPACE",
+  // },
   {
-    label: "Log New Requisition",
-    icon: PlusSquare,
-    path: "/rental-master-form",
-    group: "WORKSPACE",
-  },
-  {
-    label: "Inventory & Assets",
+    label: "Master Info",
     icon: Box,
     path: "/inventory",
     group: "WORKSPACE",
   },
-  {
-    label: "Reports & Ledger",
-    icon: BarChart3,
-    path: "/requisitions/new",
-    group: "WORKSPACE",
-  },
+  // {
+  //   label: "Reports & Ledger",
+  //   icon: BarChart3,
+  //   path: "/requisitions/new",
+  //   group: "WORKSPACE",
+  // },
   {
     label: "Notification Center",
     icon: Bell,

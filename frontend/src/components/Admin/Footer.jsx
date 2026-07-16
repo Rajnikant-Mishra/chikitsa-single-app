@@ -10,9 +10,7 @@ const Footer = () => {
       </div>
       <div className="flex items-center gap-6">
         <p>© 2026 Evoquesys . All rights reserved.</p>
-        <span className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider">
-          <Lock size={10} /> TLS 1.3 Encrypted
-        </span>
+        
       </div>
     </footer>
   );
