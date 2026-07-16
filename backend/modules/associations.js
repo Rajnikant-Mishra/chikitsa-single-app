@@ -1,6 +1,6 @@
 import Rental from "./rentalmaster/master.model.js";
 import Device from "./device/device.model.js";
-import CareCenter from "./carecenter/carecenter.model.js"; // Import CareCenter
+import CareCenter from "./carecenter/carecenter.model.js";
 
 // Device <-> Rental Associations
 Device.hasMany(Rental, {

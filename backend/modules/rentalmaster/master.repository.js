@@ -27,7 +27,7 @@ class RentalRepository {
         },
         {
           model: CareCenter,
-          as: "careCenter", // Assumes you defined: Rental.belongsTo(CareCenter, { foreignKey: 'care_center_id', as: 'careCenter' })
+          as: "careCenter", 
           attributes: [
             "carecenter_id",
             "carecenter_name",
