@@ -658,6 +658,10 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                 <thead>
                   <tr className="border-b border-slate-100 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest bg-white">
                     <th className="px-6 py-4 font-bold w-28">Status</th>
+                    <th className="px-6 py-4 font-bold w-28">Deal types</th>
+                    <th className="px-6 py-4 font-bold w-28">Units</th>
+                    <th className="px-6 py-4 font-bold w-28">Modes</th>
+                    
                     <th className="px-6 py-4 font-bold">Device</th>
                     <th className="px-6 py-4 font-bold">Patients</th>
                     <th className="px-6 py-4 font-bold w-36">Login Date</th>
@@ -680,6 +684,15 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                       >
                         <td className="px-6 py-4 whitespace-nowrap align-middle">
                           {getStatusBadge(rental.status)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap align-middle">
+                          {rental.deal_type}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap align-middle">
+                          {rental.unit}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap align-middle">
+                          {rental.mode}
                         </td>
                         <td className="px-6 py-4 font-bold text-[#0e4a67] hover:underline cursor-pointer align-middle">
                           {displayDeviceModel}
