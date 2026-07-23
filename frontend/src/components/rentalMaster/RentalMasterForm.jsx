@@ -1099,8 +1099,8 @@ export default function RentalForm({
                   className="w-full px-4 py-3 border border-emerald-300 text-emerald-900 bg-white rounded-xl text-base font-bold focus:outline-none shadow-sm"
                 >
                   <option value="select">---Select ---</option>
-                  <option value="Monthly">B2B</option>
-                  <option value="Fort Night">B2C</option>
+                  <option value="B2B">B2B</option>
+                  <option value="B2C">B2C</option>
                 </select>
               </div>
 
@@ -1116,9 +1116,9 @@ export default function RentalForm({
                   }
                   className="w-full px-4 py-3 border border-emerald-300 text-emerald-900 bg-white rounded-xl text-base font-bold focus:outline-none shadow-sm"
                 >
-                  {/* <option value="Monthly">---Select ---</option> */}
-                  <option value="Monthly">CWF</option>
-                  <option value="Fort Night">ODCOM</option>
+                  <option value="Monthly">---Select ---</option>
+                  <option value="CWF">CWF</option>
+                  <option value="ODCOM">ODCOM</option>
                 </select>
               </div>
 
@@ -1134,9 +1134,9 @@ export default function RentalForm({
                   }
                   className="w-full px-4 py-3 border border-emerald-300 text-emerald-900 bg-white rounded-xl text-base font-bold focus:outline-none shadow-sm"
                 >
-                  {/* <option value="Monthly">---Select ---</option> */}
-                  <option value="Monthly">Prepaid</option>
-                  <option value="Fort Night">Postpaid</option>
+                  <option value="Monthly">---Select ---</option>
+                  <option value="Prepaid">Prepaid</option>
+                  <option value="Postpaid">Postpaid</option>
                 </select>
               </div>
             </div>

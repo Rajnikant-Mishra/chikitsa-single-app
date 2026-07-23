@@ -689,10 +689,10 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                           {rental.deal_type}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap align-middle">
-                          {rental.unit}
+                          {rental.unit_type}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap align-middle">
-                          {rental.mode}
+                          {rental.mode_type}
                         </td>
                         <td className="px-6 py-4 font-bold text-[#0e4a67] hover:underline cursor-pointer align-middle">
                           {displayDeviceModel}
