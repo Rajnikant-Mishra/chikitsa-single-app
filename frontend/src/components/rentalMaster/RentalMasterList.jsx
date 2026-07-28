@@ -604,8 +604,8 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
             >
               <option value="All">Types All</option>
               <option value="Active">B2B</option>
-              <option value="Inactive">BWF</option>
-              <option value="Closed">CWF</option>
+              <option value="Inactive">B2C</option>
+              
             </select>
           </div>
 

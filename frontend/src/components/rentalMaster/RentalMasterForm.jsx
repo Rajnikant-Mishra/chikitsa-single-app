@@ -378,7 +378,7 @@ export default function RentalForm({
                   className="w-full px-4 py-3 border border-emerald-300 text-emerald-900 bg-white rounded-xl text-base font-bold focus:outline-none shadow-sm"
                 >
                   <option value="Monthly">---Select ---</option>
-                  <option value="CWF">CWF</option>
+                  <option value="CWF">BWF</option>
                   <option value="ODCOM">ODCOM</option>
                 </select>
               </div>
@@ -851,6 +851,25 @@ export default function RentalForm({
                   className="w-full px-4 py-3 border border-slate-300 rounded-xl text-slate-900 focus:outline-none shadow-sm resize-none"
                 />
               </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+            <div>
+              <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                Notes
+              </label>
+              <textarea
+                rows="2"
+                value={formData?.patient_delivery_address || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    patient_delivery_address: e.target.value,
+                  })
+                }
+                className="w-full px-4 py-3 border border-slate-300 rounded-xl text-slate-900 focus:outline-none shadow-sm resize-none"
+              />
             </div>
           </div>
 
