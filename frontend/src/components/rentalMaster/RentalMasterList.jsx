@@ -596,6 +596,19 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
             )}
           </div>
 
+          <div className="w-full md:w-36">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 focus:outline-none cursor-pointer"
+            >
+              <option value="All">Types All</option>
+              <option value="Active">B2B</option>
+              <option value="Inactive">BWF</option>
+              <option value="Closed">CWF</option>
+            </select>
+          </div>
+
           {/* Status Filter */}
           <div className="w-full md:w-36">
             <select
@@ -661,7 +674,7 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                     <th className="px-6 py-4 font-bold w-28">Deal types</th>
                     <th className="px-6 py-4 font-bold w-28">Units</th>
                     <th className="px-6 py-4 font-bold w-28">Modes</th>
-                    
+
                     <th className="px-6 py-4 font-bold">Device</th>
                     <th className="px-6 py-4 font-bold">Patients</th>
                     <th className="px-6 py-4 font-bold w-36">Login Date</th>
