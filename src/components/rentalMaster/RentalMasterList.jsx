@@ -362,6 +362,12 @@
 //   );
 // }
 
+
+
+
+
+
+
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "../Admin/Layout";
 import { useNavigate } from "react-router-dom";
@@ -553,87 +559,100 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
 
   return (
     <DashboardLayout>
+      <div className="w-full max-w-full mx-auto p-4 sm:p-6 bg-white">
+  {/* Header */}
+  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-5">
+    <div className="min-w-0">
+      <h1 className="text-[20px] sm:text-[22px] font-bold text-[#0f172a] tracking-tight truncate">
+        Rental Master Sheet
+      </h1>
+      <p className="text-slate-400 text-xs mt-0.5 font-medium">
+        Live view of all requisitions.
+      </p>
+    </div>
+
+   <button
+  onClick={() => navigate("/rental-requisition")}
+  className="hidden sm:flex w-auto self-start px-4 py-2.5 bg-[#0e4a67] hover:bg-[#0a384e] text-white font-bold text-xs rounded-md shadow-sm transition items-center justify-center gap-1.5"
+>
+  Log New Requisition
+</button>
+  </div>
+
+  {/* Filter Toolbar */}
+  <div className="border border-slate-200 rounded-lg p-3 bg-white flex flex-col gap-2.5 mb-4 shadow-sm w-full max-w-[260px] sm:max-w-none">
+  <button
+    onClick={() => navigate("/rental-requisition")}
+    className="flex sm:hidden w-auto self-start px-4 py-2.5 bg-[#0e4a67] hover:bg-[#0a384e] text-white font-bold text-xs rounded-md shadow-sm transition items-center justify-center gap-1.5"
+  >
+    Log New Requisition
+  </button>
+
+  {/* Search */}
+  <div className="relative w-full">
+    <span className="absolute left-3 top-2.5 text-slate-400 text-sm">
+      🔍
+    </span>
+    <input
+      type="text"
+      placeholder="Search Patient Name, Phone,"
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      className="w-full pl-8 pr-8 py-2 border border-slate-200 rounded-md text-xs placeholder:text-slate-400 text-slate-700 focus:outline-none focus:border-slate-300"
+    />
+    {searchTerm && (
+      <button
+        onClick={() => setSearchTerm("")}
+        className="absolute right-3 top-2 text-slate-300 hover:text-slate-500 text-sm"
+      >
+        ✕
+      </button>
+    )}
+  </div>
+
+  {/* Status Filter */}
+  <div className="w-full">
+    <select
+      value={statusFilter}
+      onChange={(e) => setStatusFilter(e.target.value)}
+      className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 focus:outline-none cursor-pointer"
+    >
+      <option value="All">Status: All</option>
+      <option value="Active">Active</option>
+      <option value="Inactive">Inactive</option>
+      <option value="Closed">Closed</option>
+    </select>
+  </div>
+
+  {/* Device Filter */}
+  <div className="w-full">
+    <select
+      value={deviceFilter}
+      onChange={(e) => setDeviceFilter(e.target.value)}
+      className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 focus:outline-none cursor-pointer"
+    >
+      <option value="All">All Devices</option>
+      {uniqueDevices.map((device) => (
+        <option key={device} value={device}>
+          {device}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  {/* Reset */}
+  <button
+    type="button"
+    onClick={handleReset}
+    className="w-full px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-xs text-slate-600 rounded-md transition font-medium"
+  >
+    Reset
+  </button>
+</div>
+</div>
       <div className="w-full mx-auto p-6 bg-white min-h-screen">
-        {/* Headline Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
-          <div>
-            <h1 className="text-[22px] font-bold text-[#0f172a] tracking-tight">
-              Rental Master Sheet
-            </h1>
-            <p className="text-slate-400 text-xs mt-0.5 font-medium">
-              Live view of all requisitions.
-            </p>
-          </div>
-
-          <button
-            onClick={() => navigate("/rental-requisition")}
-            className="w-full sm:w-auto px-4 py-2 bg-[#0e4a67] hover:bg-[#0a384e] text-white font-bold text-xs rounded-md shadow-sm transition flex items-center justify-center gap-1.5 self-start sm:self-auto decoration-transparent"
-          >
-            Log New Requisition
-          </button>
-        </div>
-
-        {/* Filter Toolbar Area */}
-        <div className="border border-slate-200 rounded-lg p-3 bg-white flex flex-col md:flex-row gap-2.5 items-center mb-4 shadow-sm">
-          <div className="relative w-full md:flex-1">
-            <span className="absolute left-3 top-2.5 text-slate-400 text-sm">
-              🔍
-            </span>
-            <input
-              type="text"
-              placeholder="Search Patient Name, Phone, Asset ID, or Care Center..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-8 py-2 border border-slate-200 rounded-md text-xs placeholder:text-slate-400 text-slate-700 focus:outline-none focus:border-slate-300"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm("")}
-                className="absolute right-3 top-2 text-slate-300 hover:text-slate-500 text-sm"
-              >
-                ✕
-              </button>
-            )}
-          </div>
-
-          {/* Status Filter */}
-          <div className="w-full md:w-36">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 focus:outline-none cursor-pointer"
-            >
-              <option value="All">Status: All</option>
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-              <option value="Closed">Closed</option>
-            </select>
-          </div>
-
-          {/* Dynamic Device Options List */}
-          <div className="w-full md:w-44">
-            <select
-              value={deviceFilter}
-              onChange={(e) => setDeviceFilter(e.target.value)}
-              className="w-full px-2.5 py-2 bg-white border border-slate-200 rounded-md text-xs font-medium text-slate-700 focus:outline-none cursor-pointer"
-            >
-              <option value="All">All Devices</option>
-              {uniqueDevices.map((device) => (
-                <option key={device} value={device}>
-                  {device}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleReset}
-            className="w-full md:w-auto px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-xs text-slate-600 rounded-md transition font-medium"
-          >
-            Reset
-          </button>
-        </div>
+      
+       
 
         <p className="text-xs text-slate-400 font-bold mb-3 px-0.5 tracking-wide">
           {filteredRentals.length} records shown
