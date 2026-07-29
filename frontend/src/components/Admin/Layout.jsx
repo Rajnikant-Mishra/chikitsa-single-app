@@ -1,25 +1,56 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import Footer from "./Footer";
 
 const DashboardLayout = ({ title, children }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
+
+ useEffect(() => {
+  const handleResize = () => {
+    const width = window.innerWidth;
+
+   if (width >= 1440) {
+  // Large desktop
+  setCollapsed(false);
+} else {
+  // Laptop, tablet, mobile
+  setCollapsed(true);
+}
+  };
+
+  handleResize();
+  window.addEventListener("resize", handleResize);
+
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
+
   return (
-    <div className="min-h-screen bg-slate-50/60 font-sans flex text-slate-800 antialiased selection:bg-[#1976d2]/10">
-      {/* Structural Sidebar Fixed Stack */}
-      <Sidebar />
+    <div className="flex min-h-screen bg-slate-50">
 
-      {/* Workspace Display Grid Panel */}
-      <div className="flex-1 pl-72 flex flex-col min-h-screen">
-        {/* Universal Sticky Header Frame */}
-        <Header title={title} />
+     <Sidebar
+  collapsed={collapsed}
+  sidebarOpen={sidebarOpen}
+  isOpen={sidebarOpen}
+  onClose={() => setSidebarOpen(false)}
+/>
 
-        {/* Dynamic Page Target Canvas */}
-        <main className="flex-1 pt-28 p-8 max-w-[1600px] w-full mx-auto space-y-8">
+      <div
+        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
+             collapsed ? "pl-20" : "pl-72"
+        }`}
+      >
+        <Header
+  title={title}
+  onMenuClick={() => {
+    setSidebarOpen(!sidebarOpen);
+  }}
+/>
+        <main className="flex-1 mt-12 pt-24 p-4 md:p-6 lg:p-8 max-w-[1600px] w-full mx-auto">
           {children}
         </main>
 
-        {/* Universal Footer Strip */}
         <Footer />
       </div>
     </div>

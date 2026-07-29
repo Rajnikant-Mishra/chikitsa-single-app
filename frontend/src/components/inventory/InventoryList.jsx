@@ -431,7 +431,7 @@
 //                       placeholder="Physical geographical address"
 //                     />
 //                   </div>
-//                   <div className="grid grid-cols-2 gap-4">
+//                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 //                     <div>
 //                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Mobile Number *</label>
 //                       <input
@@ -454,7 +454,7 @@
 
 //               {activeTab === "reference" && (
 //                 <div className="space-y-4">
-//                   <div className="grid grid-cols-2 gap-4">
+//                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 //                     <div>
 //                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Doctor Name *</label>
 //                       <input
@@ -473,7 +473,7 @@
 //                       />
 //                     </div>
 //                   </div>
-//                   <div className="grid grid-cols-2 gap-4">
+//                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 //                     <div>
 //                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Mobile No *</label>
 //                       <input
@@ -788,22 +788,28 @@ export default function App() {
   return (
     <DashboardLayout>
       {/* Sleek, Modernized Top Workspace Bar */}
-      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 mb-8 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Global Inventory Ledger</h1>
-          <p className="text-slate-400 text-xs mt-0.5 font-medium">Real-time modular tracking infrastructure.</p>
-        </div>
+     <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 mb-8 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm w-full max-w-[260px] sm:max-w-none">
+  <div>
+    <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+      Global Inventory Ledger
+    </h1>
+    <p className="text-slate-400 text-xs mt-0.5 font-medium">
+      Real-time modular tracking infrastructure.
+    </p>
+  </div>
 
-        <div className="flex items-center gap-4 self-end lg:self-auto">
-          <div className="text-xs font-semibold px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-600">
-            Active: <span className="text-emerald-600 font-bold">{availableCount}</span>
-          </div>
-          <div className="text-xs font-semibold px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-600">
-            Inactive: <span className="text-rose-600 font-bold">{criticalCount}</span>
-          </div>
-          {renderTabAction()}
-        </div>
-      </div>
+ <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 self-start sm:self-end lg:self-auto w-full sm:w-auto">
+  <div className="text-xs font-semibold px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 w-full sm:w-auto text-center">
+    Active: <span className="text-emerald-600 font-bold">{availableCount}</span>
+  </div>
+  <div className="text-xs font-semibold px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-600 w-full sm:w-auto text-center">
+    Inactive: <span className="text-rose-600 font-bold">{criticalCount}</span>
+  </div>
+  <div className="w-full sm:w-auto">
+    {renderTabAction()}
+  </div>
+</div>
+</div>
 
       {/* --- TAB NAVIGATION SYSTEM --- */}
       <div className="mb-6 border-b border-slate-200 overflow-x-auto flex scrollbar-none">
@@ -978,261 +984,303 @@ export default function App() {
       </div>
 
       {/* --- CENTRALIZED DYNAMIC SYSTEM DIALOG (MODAL) --- */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="bg-[#0e4a67] text-white p-6 flex justify-between items-center">
-              <h3 className="text-xl font-bold tracking-wide capitalize">
-                {activeTab === "device" && (deviceForm.device_id ? "📝 Modify Device Asset" : "➕ Register Device Asset")}
-                {activeTab === "accessories" && (accessoryForm.accessory_id ? "📝 Modify Accessory" : "📦 Add New Accessory")}
-                {activeTab === "care" && (careForm.carecenter_id ? "📝 Modify Care Center" : "🛠️ Care Center Registry Form")}
-                {activeTab === "reference" && (referenceForm.reference_id ? "📝 Modify Reference Record" : "📋 Link External Reference Record")}
-                {activeTab === "delivery" && (deliveryForm.delivery_executive_id ? "📝 Modify Delivery Courier Node" : "🚴 Onboard Delivery Courier Node")}
-              </h3>
-              <button onClick={handleCloseModal} className="text-white/80 hover:text-white text-xl">✕</button>
+{isModalOpen && (
+  <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-1.5 sm:p-3">
+    {/* Modal box – always ≤ 260px wide */}
+    <div className="bg-white rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.55)] w-full max-w-[260px] max-h-[95vh] overflow-hidden flex flex-col">
+      
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 shrink-0">
+        <h2 className="text-base font-bold text-slate-800 leading-tight pr-2">
+          {activeTab === "device" && (deviceForm.device_id ? "📝 Modify Device Asset" : "➕ Register Device Asset")}
+          {activeTab === "accessories" && (accessoryForm.accessory_id ? "📝 Modify Accessory" : "📦 Add New Accessory")}
+          {activeTab === "care" && (careForm.carecenter_id ? "📝 Modify Care Center" : "🛠️ Care Center Registry Form")}
+          {activeTab === "reference" && (referenceForm.reference_id ? "📝 Modify Reference Record" : "📋 Link External Reference Record")}
+          {activeTab === "delivery" && (deliveryForm.delivery_executive_id ? "📝 Modify Delivery Courier Node" : "🚴 Onboard Delivery Courier Node")}
+        </h2>
+        <button
+          type="button"
+          onClick={handleCloseModal}
+          className="text-slate-400 hover:text-slate-700 text-xl leading-none p-1 shrink-0"
+          aria-label="Close"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Scrollable form body */}
+      <form
+        id="asset-modal-form"
+        onSubmit={handleSubmit}
+        className="flex-1 overflow-y-auto overscroll-contain p-3 space-y-3"
+      >
+        {/* ===== DEVICE ===== */}
+        {activeTab === "device" && (
+          <>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+                Device Model Name
+              </label>
+              <input
+                type="text"
+                required
+                value={deviceForm.device_name}
+                onChange={(e) => setDeviceForm({ ...deviceForm, device_name: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
+                placeholder="e.g. Oxygen Concentrator X1"
+              />
             </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+                Operational State
+              </label>
+              <select
+                value={deviceForm.status}
+                onChange={(e) => setDeviceForm({ ...deviceForm, status: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-700"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </>
+        )}
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              {activeTab === "device" && (
-                <>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Device Model Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={deviceForm.device_name}
-                      onChange={(e) => setDeviceForm({ ...deviceForm, device_name: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
-                      placeholder="e.g. Oxygen Concentrator X1"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Operational State</label>
-                    <select
-                      value={deviceForm.status}
-                      onChange={(e) => setDeviceForm({ ...deviceForm, status: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-700"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
-                  </div>
-                </>
-              )}
+        {/* ===== ACCESSORIES ===== */}
+        {activeTab === "accessories" && (
+          <>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+                Accessory Component Name
+              </label>
+              <input
+                type="text"
+                required
+                value={accessoryForm.accessory_name}
+                onChange={(e) => setAccessoryForm({ ...accessoryForm, accessory_name: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
+                placeholder="e.g. High Pressure Nasal Cannula"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">Status</label>
+              <select
+                value={accessoryForm.status}
+                onChange={(e) => setAccessoryForm({ ...accessoryForm, status: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-700"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </>
+        )}
 
-              {activeTab === "accessories" && (
-                <>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Accessory Component Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={accessoryForm.accessory_name}
-                      onChange={(e) => setAccessoryForm({ ...accessoryForm, accessory_name: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
-                      placeholder="e.g. High Pressure Nasal Cannula"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Status</label>
-                    <select
-                      value={accessoryForm.status}
-                      onChange={(e) => setAccessoryForm({ ...accessoryForm, status: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-700"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
-                  </div>
-                </>
-              )}
+        {/* ===== CARE CENTER ===== */}
+        {activeTab === "care" && (
+          <>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+                Care Center name
+              </label>
+              <input
+                type="text"
+                required
+                value={careForm.carecenter_name}
+                onChange={(e) => setCareForm({ ...careForm, carecenter_name: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
+                placeholder="e.g. Lifeline Central Medical Dispatch"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">Address</label>
+              <textarea
+                required
+                rows={2}
+                value={careForm.address}
+                onChange={(e) => setCareForm({ ...careForm, address: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800 resize-none"
+                placeholder="Enter operational mailing address"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+                Mobile number
+              </label>
+              <input
+                type="text"
+                required
+                value={careForm.mobile_number}
+                onChange={(e) => setCareForm({ ...careForm, mobile_number: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-mono text-slate-800"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+                Alternative Mobile number
+              </label>
+              <input
+                type="text"
+                value={careForm.alternative_mobile_number || ""}
+                onChange={(e) => setCareForm({ ...careForm, alternative_mobile_number: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-mono text-slate-800"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">Status</label>
+              <select
+                value={careForm.status}
+                onChange={(e) => setCareForm({ ...careForm, status: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-700"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </>
+        )}
 
-              {activeTab === "care" && (
-                <>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Care Center  name</label>
-                    <input
-                      type="text"
-                      required
-                      value={careForm.carecenter_name}
-                      onChange={(e) => setCareForm({ ...careForm, carecenter_name: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
-                      placeholder="e.g. Lifeline Central Medical Dispatch"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Address</label>
-                    <textarea
-                      required
-                      rows="2"
-                      value={careForm.address}
-                      onChange={(e) => setCareForm({ ...careForm, address: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
-                      placeholder="Enter operational mailing address"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Mobile number</label>
-                      <input
-                        type="text"
-                        required
-                        value={careForm.mobile_number}
-                        onChange={(e) => setCareForm({ ...careForm, mobile_number: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-mono text-slate-800"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Alternative Mobile number</label>
-                      <input
-                        type="text"
-                        value={careForm.alternative_mobile_number || ""}
-                        onChange={(e) => setCareForm({ ...careForm, alternative_mobile_number: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-mono text-slate-800"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Status</label>
-                    <select
-                      value={careForm.status}
-                      onChange={(e) => setCareForm({ ...careForm, status: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-700"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
-                  </div>
-                </>
-              )}
+        {/* ===== REFERENCE ===== */}
+        {activeTab === "reference" && (
+          <>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+                Doctor Name
+              </label>
+              <input
+                type="text"
+                required
+                value={referenceForm.doctor_name}
+                onChange={(e) => setReferenceForm({ ...referenceForm, doctor_name: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+                Specialist Domain
+              </label>
+              <input
+                type="text"
+                required
+                value={referenceForm.specialist}
+                onChange={(e) => setReferenceForm({ ...referenceForm, specialist: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
+                placeholder="e.g. Pulmonologist"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+                Hospital Institute Name
+              </label>
+              <input
+                type="text"
+                required
+                value={referenceForm.hospital_name}
+                onChange={(e) => setReferenceForm({ ...referenceForm, hospital_name: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+                Mobile Number
+              </label>
+              <input
+                type="text"
+                required
+                value={referenceForm.mobile_number}
+                onChange={(e) => setReferenceForm({ ...referenceForm, mobile_number: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-mono text-slate-800"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+                Alternative Number
+              </label>
+              <input
+                type="text"
+                value={referenceForm.alternative_number || ""}
+                onChange={(e) => setReferenceForm({ ...referenceForm, alternative_number: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-mono text-slate-800"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">Status</label>
+              <select
+                value={referenceForm.status}
+                onChange={(e) => setReferenceForm({ ...referenceForm, status: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-700"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </>
+        )}
 
-              {activeTab === "reference" && (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Doctor Name</label>
-                      <input
-                        type="text"
-                        required
-                        value={referenceForm.doctor_name}
-                        onChange={(e) => setReferenceForm({ ...referenceForm, doctor_name: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Specialist Domain</label>
-                      <input
-                        type="text"
-                        required
-                        value={referenceForm.specialist}
-                        onChange={(e) => setReferenceForm({ ...referenceForm, specialist: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
-                        placeholder="e.g. Pulmonologist"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Hospital Institute Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={referenceForm.hospital_name}
-                      onChange={(e) => setReferenceForm({ ...referenceForm, hospital_name: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Mobile Number</label>
-                      <input
-                        type="text"
-                        required
-                        value={referenceForm.mobile_number}
-                        onChange={(e) => setReferenceForm({ ...referenceForm, mobile_number: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-mono text-slate-800"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Alternative Number</label>
-                      <input
-                        type="text"
-                        value={referenceForm.alternative_number || ""}
-                        onChange={(e) => setReferenceForm({ ...referenceForm, alternative_number: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-mono text-slate-800"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Status</label>
-                    <select
-                      value={referenceForm.status}
-                      onChange={(e) => setReferenceForm({ ...referenceForm, status: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-700"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
-                  </div>
-                </>
-              )}
+        {/* ===== DELIVERY ===== */}
+        {activeTab === "delivery" && (
+          <>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+                Executive Driver Name
+              </label>
+              <input
+                type="text"
+                required
+                value={deliveryForm.delivery_name}
+                onChange={(e) => setDeliveryForm({ ...deliveryForm, delivery_name: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
+                placeholder="Enter legal profile name"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">
+                Active Mobile Hotline
+              </label>
+              <input
+                type="text"
+                required
+                value={deliveryForm.mobile_number}
+                onChange={(e) => setDeliveryForm({ ...deliveryForm, mobile_number: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-mono text-slate-800"
+                placeholder="e.g. +91XXXXXXXXXX"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1.5">Status</label>
+              <select
+                value={deliveryForm.status}
+                onChange={(e) => setDeliveryForm({ ...deliveryForm, status: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-700"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </>
+        )}
+      </form>
 
-              {activeTab === "delivery" && (
-                <>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Executive Driver Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={deliveryForm.delivery_name}
-                      onChange={(e) => setDeliveryForm({ ...deliveryForm, delivery_name: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-800"
-                      placeholder="Enter legal profile name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Active Mobile Hotline</label>
-                    <input
-                      type="text"
-                      required
-                      value={deliveryForm.mobile_number}
-                      onChange={(e) => setDeliveryForm({ ...deliveryForm, mobile_number: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-mono text-slate-800"
-                      placeholder="e.g. +91XXXXXXXXXX"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Status</label>
-                    <select
-                      value={deliveryForm.status}
-                      onChange={(e) => setDeliveryForm({ ...deliveryForm, status: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0e4a67] font-semibold text-slate-700"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
-                  </div>
-                </>
-              )}
-
-              <div className="pt-4 border-t border-slate-100 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 rounded-xl text-slate-500 hover:bg-slate-50 text-sm font-bold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#0e4a67] text-white hover:bg-[#155e82] text-sm font-bold shadow-sm"
-                >
-                  Commit Entry
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Sticky footer */}
+      <div className="shrink-0 bg-white border-t border-slate-100 px-3 py-2.5 flex flex-col gap-2">
+        <button
+          type="submit"
+          form="asset-modal-form"
+          className="w-full px-4 py-2.5 rounded-xl bg-[#0e4a67] text-white hover:bg-[#155e82] font-bold shadow-sm transition-colors"
+        >
+          Commit Entry
+        </button>
+        <button
+          type="button"
+          onClick={handleCloseModal}
+          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </DashboardLayout>
   );
 }

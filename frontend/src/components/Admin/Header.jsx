@@ -150,7 +150,8 @@ import {
   LogOut, 
   User, 
   ShieldAlert, 
-  Server 
+  Server ,
+  Menu
 } from "lucide-react";
 
 // Helper function to safely decode JWT payload without external library
@@ -171,7 +172,8 @@ const decodeToken = (token) => {
   }
 };
 
-const Header = ({ title = "Dashboard Console" }) => {
+const Header = ({   title = "Dashboard Console",
+  onMenuClick}) => {
   const navigate = useNavigate();
   const [profileOpen, setProfileOpen] = useState(false);
   const [userData, setUserData] = useState({ name: "Admin", email: "admin@system.com", role: "admin" });
@@ -228,14 +230,33 @@ const Header = ({ title = "Dashboard Console" }) => {
   };
 
   return (
-    <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 fixed top-0 right-0 left-72 z-20 flex items-center justify-between px-8 shadow-[0_4px_30px_rgba(0,0,0,0.01)] select-none">
+     <header
+  className="
+  fixed top-0 right-0 left-0
+  h-20 bg-white
+  border-b border-slate-200
+  flex items-center justify-between
+  px-6
+  z-40
+  shadow-sm
+"
+>
       
       {/* Search and Navigation Title Scope */}
-      <div className="flex items-center gap-6">
-        <h1 className="text-lg font-black tracking-tight text-slate-900 uppercase">
-          {title}
-        </h1>
-      </div>
+   
+        <div className="flex items-center gap-4 ms-13">
+ <button
+  onClick={onMenuClick}
+    className="p-2 rounded-lg hover:bg-slate-100 2xl:hidden"
+>
+  <Menu size={22} />
+</button>
+
+  <h1 className="text-lg font-black tracking-tight text-slate-900 uppercase">
+    {title}
+  </h1>
+</div>
+       
 
       {/* Global Utilities Frame */}
       <div className="flex items-center gap-4">

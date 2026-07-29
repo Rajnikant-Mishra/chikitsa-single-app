@@ -46,7 +46,7 @@
 //     icon: FileBarChart,
 //     path: "/requisitions/new",
 //   },
-  
+
 // ];
 
 // // ==========================================
@@ -132,7 +132,11 @@
 //                         : inactiveStyles
 //                     }`}
 //                   >
-//                     <div className="flex items-center gap-3.5">
+//                     <div
+//   className={`flex items-center ${
+//     collapsed ? "" : "gap-3.5"
+//   }`}
+// >
 //                       <IconComponent size={16} className="text-cyan-200" />
 //                       <span>{item.label}</span>
 //                     </div>
@@ -196,10 +200,6 @@
 
 // export default Sidebar;
 
-
-
-
-
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -251,10 +251,16 @@ const NAV_ITEMS = [
 // ==========================================
 // CORE SIDEBAR COMPONENT
 // ==========================================
-const Sidebar = () => {
+
+const Sidebar = ({
+   collapsed,
+  sidebarOpen,
+  isOpen,
+  onClose,
+}) => {
   const location = useLocation();
   const navigate = useNavigate();
-
+const expanded = !collapsed || sidebarOpen;
   // Mocked state value to align with UI design requirements
   const currentUser = {
     name: "Rajesh K.",
@@ -269,10 +275,23 @@ const Sidebar = () => {
 
   const renderGroupSection = (groupName) => {
     return (
+      
       <div key={groupName} className="space-y-1">
-        <p className="text-[10px] font-black text-slate-400 tracking-widest uppercase px-3 mb-2.5">
-          {groupName}
-        </p>
+<<<<<<< HEAD:src/components/Admin/Sidebar.jsx
+        {expanded && (
+  <p
+  className={`
+    text-[10px] font-black text-slate-400 tracking-widest uppercase
+    overflow-hidden whitespace-nowrap
+    transition-all duration-300 ease-in-out
+    ${expanded
+      ? "opacity-100 max-h-10 mb-2.5 px-3"
+      : "opacity-0 max-h-0 mb-0 px-0"}
+  `}
+>
+  {groupName}
+</p>
+)}
         
         {NAV_ITEMS.filter((item) => item.group === groupName).map((item, index) => {
           const IconComponent = item.icon;
@@ -282,21 +301,36 @@ const Sidebar = () => {
             <button
               key={index}
               onClick={() => navigate(item.path)}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all text-left ${
-                isActive
-                  ? "bg-[#007a78] text-white shadow-inner"
-                  : "text-slate-300 hover:bg-white/5 hover:text-white"
-              }`}
+             className={`w-full flex items-center ${
+   expanded ? "justify-between" : "justify-center"
+} px-4 py-3 rounded-xl font-bold text-sm transition-all text-left ${
+  isActive
+    ? "bg-[#007a78] text-white shadow-inner"
+    : "text-slate-300 hover:bg-white/5 hover:text-white"
+}`}
             >
-              <div className="flex items-center gap-3.5">
-                <IconComponent 
-                  size={18} 
-                  className={isActive ? "text-[#5bf2ca]" : "text-slate-300"} 
-                />
-                <span>{item.label}</span>
-              </div>
+             <div className="flex items-center overflow-hidden">
+  <IconComponent
+    size={18}
+    className={`flex-shrink-0 ${
+      isActive ? "text-[#5bf2ca]" : "text-slate-300"
+    }`}
+  />
+
+  <span
+    className={`
+      whitespace-nowrap overflow-hidden
+      transition-all duration-300 ease-in-out
+      ${expanded
+        ? "opacity-100 ml-3 max-w-[200px]"
+        : "opacity-0 ml-0 max-w-0"}
+    `}
+  >
+    {item.label}
+  </span>
+</div>
               
-              {item.badgeCount && (
+              {item.badgeCount && expanded && (
                 <span className="bg-rose-500 text-white text-[11px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
                   {item.badgeCount}
                 </span>
@@ -304,40 +338,165 @@ const Sidebar = () => {
             </button>
           );
         })}
+=======
+        <p className="text-[10px] font-black text-slate-400 tracking-widest uppercase px-3 mb-2.5">
+          {groupName}
+        </p>
+
+        {NAV_ITEMS.filter((item) => item.group === groupName).map(
+          (item, index) => {
+            const IconComponent = item.icon;
+            const isActive = location.pathname === item.path;
+
+            return (
+              <button
+                key={index}
+                onClick={() => navigate(item.path)}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all text-left ${
+                  isActive
+                    ? "bg-[#007a78] text-white shadow-inner"
+                    : "text-slate-300 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <div className="flex items-center gap-3.5">
+                  <IconComponent
+                    size={18}
+                    className={isActive ? "text-[#5bf2ca]" : "text-slate-300"}
+                  />
+                  <span>{item.label}</span>
+                </div>
+
+                {item.badgeCount && (
+                  <span className="bg-rose-500 text-white text-[11px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
+                    {item.badgeCount}
+                  </span>
+                )}
+              </button>
+            );
+          },
+        )}
+>>>>>>> 7930e99f598ac081a17547b10b1ef81774cb1f6f:frontend/src/components/Admin/Sidebar.jsx
       </div>
     );
   };
 
+<<<<<<< HEAD:src/components/Admin/Sidebar.jsx
+ return (
+  <>
+    {/* Mobile Overlay */}
+   {sidebarOpen && collapsed && (
+  <div
+    className="fixed inset-0 bg-black/40 z-40"
+    onClick={onClose}
+  />
+)}
+  <aside
+  className={`
+    fixed left-0 top-0 h-screen
+    bg-[#0b4864]
+    border-r border-slate-800/10
+    transition-all duration-300
+    z-50
+=======
   return (
     <aside className="w-[300px] h-screen bg-[#0b4864] flex flex-col justify-between fixed left-0 top-0 z-30 select-none border-r border-slate-800/10 font-sans">
       <div>
-        
         {/* Exact Header Branding Layout */}
         <div className="bg-[#007a78] px-6 py-5 flex items-center gap-2.5">
-          <svg 
-            className="w-7 h-7 text-[#5bf2ca]" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24" 
+          <svg
+            className="w-7 h-7 text-[#5bf2ca]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
             strokeWidth="2.5"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12h1.5m0 0l2-4 3 8 4-11 2.5 7h1.5" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4.5 12h1.5m0 0l2-4 3 8 4-11 2.5 7h1.5"
+            />
           </svg>
-          <span className="text-white font-black text-xl tracking-wider">CHIKITSA</span>
+          <span className="text-white font-black text-xl tracking-wider">
+            CHIKITSA
+          </span>
           <span className="bg-[#1fc29c] text-[#074737] text-[10px] font-bold px-1.5 py-0.5 rounded-md transform -translate-y-0.5">
             OS
           </span>
         </div>
+>>>>>>> 7930e99f598ac081a17547b10b1ef81774cb1f6f:frontend/src/components/Admin/Sidebar.jsx
 
-        {/* Dynamic Categorized Container Blocks */}
-        <div className="px-4 py-6 space-y-7">
-          {renderGroupSection("WORKSPACE")}
-          {renderGroupSection("ALERTS")}
-        </div>
-      </div>
+   ${
+  expanded
+    ? "w-[300px] shadow-2xl"
+    : "w-20"
+}
+  `}
+>
+  {/* Logo */}
+  <div className="h-20 flex items-center justify-center border-b border-white/10">
+    {expanded ? (
+<div
+  className={`
+    h-20 flex items-center
+    transition-all duration-300
+    ${expanded ? "px-6 justify-start" : "justify-center"}
+  `}
+>
+  <LayoutGrid className="w-7 h-7 text-[#5bf2ca] flex-shrink-0" />
 
+<<<<<<< HEAD:src/components/Admin/Sidebar.jsx
+  <div
+    className={`
+      overflow-hidden whitespace-nowrap
+      transition-all duration-300 ease-in-out
+      ${expanded
+        ? "opacity-100 max-w-[220px] ml-3"
+        : "opacity-0 max-w-0 ml-0"}
+    `}
+  >
+    <span className="text-white font-black text-xl">
+      CHIKITSA
+    </span>
+  </div>
+</div>
+) : (
+  <div className="h-20 flex items-center justify-center">
+    <LayoutGrid className="w-7 h-7 text-[#5bf2ca]" />
+  </div>
+)}
+  </div>
+
+  {/* Menu */}
+  <div className="p-4 space-y-6">
+    {renderGroupSection("WORKSPACE")}
+    {renderGroupSection("ALERTS")}
+  </div>
+
+  {/* Logout */}
+  <div className="absolute bottom-0 w-full p-4 border-t border-white/10">
+    <button
+      onClick={handleLogout}
+      className="w-full flex items-center justify-center gap-2 bg-red-500 text-white py-3 rounded-lg"
+    >
+      <LogOut size={18} />
+      <span
+  className={`
+    overflow-hidden whitespace-nowrap
+    transition-all duration-300 ease-in-out
+    ${expanded
+      ? "opacity-100 max-w-[100px]"
+      : "opacity-0 max-w-0"}
+  `}
+>
+  Logout
+</span>
+    </button>
+  </div>
+</aside>
+  </>
+=======
       {/* Profile Bar Anchor Row Container */}
-      <div className="border-t border-white/5 bg-[#08384f]/60 p-5 flex items-center justify-between">
+      {/* <div className="border-t border-white/5 bg-[#08384f]/60 p-5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-[#1fc29c] text-[#074737] font-extrabold text-sm flex items-center justify-center shadow-inner">
             RK
@@ -359,9 +518,22 @@ const Sidebar = () => {
         >
           <LogOut size={18} />
         </button>
-      </div>
+      </div> */}
     </aside>
+>>>>>>> 7930e99f598ac081a17547b10b1ef81774cb1f6f:frontend/src/components/Admin/Sidebar.jsx
   );
 };
 
 export default Sidebar;
+<<<<<<< HEAD:src/components/Admin/Sidebar.jsx
+
+
+
+
+
+
+
+
+
+=======
+>>>>>>> 7930e99f598ac081a17547b10b1ef81774cb1f6f:frontend/src/components/Admin/Sidebar.jsx
