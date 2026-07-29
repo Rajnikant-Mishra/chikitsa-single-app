@@ -46,7 +46,7 @@
 //     icon: FileBarChart,
 //     path: "/requisitions/new",
 //   },
-  
+
 // ];
 
 // // ==========================================
@@ -200,10 +200,6 @@
 
 // export default Sidebar;
 
-
-
-
-
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -281,6 +277,7 @@ const expanded = !collapsed || sidebarOpen;
     return (
       
       <div key={groupName} className="space-y-1">
+<<<<<<< HEAD:src/components/Admin/Sidebar.jsx
         {expanded && (
   <p
   className={`
@@ -341,10 +338,49 @@ const expanded = !collapsed || sidebarOpen;
             </button>
           );
         })}
+=======
+        <p className="text-[10px] font-black text-slate-400 tracking-widest uppercase px-3 mb-2.5">
+          {groupName}
+        </p>
+
+        {NAV_ITEMS.filter((item) => item.group === groupName).map(
+          (item, index) => {
+            const IconComponent = item.icon;
+            const isActive = location.pathname === item.path;
+
+            return (
+              <button
+                key={index}
+                onClick={() => navigate(item.path)}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all text-left ${
+                  isActive
+                    ? "bg-[#007a78] text-white shadow-inner"
+                    : "text-slate-300 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <div className="flex items-center gap-3.5">
+                  <IconComponent
+                    size={18}
+                    className={isActive ? "text-[#5bf2ca]" : "text-slate-300"}
+                  />
+                  <span>{item.label}</span>
+                </div>
+
+                {item.badgeCount && (
+                  <span className="bg-rose-500 text-white text-[11px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
+                    {item.badgeCount}
+                  </span>
+                )}
+              </button>
+            );
+          },
+        )}
+>>>>>>> 7930e99f598ac081a17547b10b1ef81774cb1f6f:frontend/src/components/Admin/Sidebar.jsx
       </div>
     );
   };
 
+<<<<<<< HEAD:src/components/Admin/Sidebar.jsx
  return (
   <>
     {/* Mobile Overlay */}
@@ -361,6 +397,33 @@ const expanded = !collapsed || sidebarOpen;
     border-r border-slate-800/10
     transition-all duration-300
     z-50
+=======
+  return (
+    <aside className="w-[300px] h-screen bg-[#0b4864] flex flex-col justify-between fixed left-0 top-0 z-30 select-none border-r border-slate-800/10 font-sans">
+      <div>
+        {/* Exact Header Branding Layout */}
+        <div className="bg-[#007a78] px-6 py-5 flex items-center gap-2.5">
+          <svg
+            className="w-7 h-7 text-[#5bf2ca]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth="2.5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4.5 12h1.5m0 0l2-4 3 8 4-11 2.5 7h1.5"
+            />
+          </svg>
+          <span className="text-white font-black text-xl tracking-wider">
+            CHIKITSA
+          </span>
+          <span className="bg-[#1fc29c] text-[#074737] text-[10px] font-bold px-1.5 py-0.5 rounded-md transform -translate-y-0.5">
+            OS
+          </span>
+        </div>
+>>>>>>> 7930e99f598ac081a17547b10b1ef81774cb1f6f:frontend/src/components/Admin/Sidebar.jsx
 
    ${
   expanded
@@ -381,6 +444,7 @@ const expanded = !collapsed || sidebarOpen;
 >
   <LayoutGrid className="w-7 h-7 text-[#5bf2ca] flex-shrink-0" />
 
+<<<<<<< HEAD:src/components/Admin/Sidebar.jsx
   <div
     className={`
       overflow-hidden whitespace-nowrap
@@ -430,10 +494,38 @@ const expanded = !collapsed || sidebarOpen;
   </div>
 </aside>
   </>
+=======
+      {/* Profile Bar Anchor Row Container */}
+      {/* <div className="border-t border-white/5 bg-[#08384f]/60 p-5 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-[#1fc29c] text-[#074737] font-extrabold text-sm flex items-center justify-center shadow-inner">
+            RK
+          </div>
+          <div>
+            <h4 className="text-white text-sm font-bold leading-tight">
+              {currentUser.name}
+            </h4>
+            <p className="text-slate-400 text-xs mt-0.5 font-medium">
+              {currentUser.role}
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={handleLogout}
+          className="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5"
+          title="Sign Out Access"
+        >
+          <LogOut size={18} />
+        </button>
+      </div> */}
+    </aside>
+>>>>>>> 7930e99f598ac081a17547b10b1ef81774cb1f6f:frontend/src/components/Admin/Sidebar.jsx
   );
 };
 
 export default Sidebar;
+<<<<<<< HEAD:src/components/Admin/Sidebar.jsx
 
 
 
@@ -443,3 +535,5 @@ export default Sidebar;
 
 
 
+=======
+>>>>>>> 7930e99f598ac081a17547b10b1ef81774cb1f6f:frontend/src/components/Admin/Sidebar.jsx
