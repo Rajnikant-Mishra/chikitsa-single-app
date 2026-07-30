@@ -16,7 +16,7 @@ const Footer = () => {
 
         {/* Right Side */}
         <div className="text-center md:text-right">
-          <p>© 2026 Evoquesys. All rights reserved.</p>
+          <p>© 2026 <a href="https://www.evoquesys.com" target="_blank">Evoquesys</a>. All rights reserved.</p>
         </div>
 
       </div>
