@@ -29,10 +29,7 @@ class AuthService {
       throw new Error("Invalid email");
     }
 
-    const match = await bcrypt.compare(
-      password,
-      user.password_hash
-    );
+    const match = await bcrypt.compare(password, user.password_hash);
 
     if (!match) {
       throw new Error("Invalid password");
@@ -46,12 +43,19 @@ class AuthService {
       process.env.JWT_SECRET,
       {
         expiresIn: "7d",
-      }
+      },
     );
 
     return {
       token,
       user,
+    };
+  }
+
+  async logout(userId) {
+    return {
+      success: true,
+      message: "Logout successful",
     };
   }
 }
