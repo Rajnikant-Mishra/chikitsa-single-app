@@ -1009,7 +1009,7 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                             )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center align-middle">
-                            <div className="flex items-center justify-center gap-1.5">
+                            {/* <div className="flex items-center justify-center gap-1.5">
                               <Link
                                 to="/rental-view"
                                 state={{ rental }}
@@ -1033,7 +1033,34 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                               >
                                 Delete
                               </button>
-                            </div>
+                            </div> */}
+
+                            <div className="flex items-center justify-center gap-1.5">
+  {/* View */}
+  <Link
+    to={`/rental-view/${rental.rental_id}`}
+    className="inline-block px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] rounded transition"
+  >
+    View
+  </Link>
+
+  {/* Edit */}
+  <Link
+    to={`/rental-edit/${rental.rental_id}`}
+    className="inline-block px-2.5 py-1 bg-[#0e4a67] hover:bg-[#0a384e] text-white font-bold text-[11px] rounded shadow-sm transition"
+  >
+    Edit
+  </Link>
+
+  {/* Delete */}
+  <button
+    type="button"
+    onClick={() => handleDeleteClick(rental.rental_id)}
+    className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[11px] rounded transition"
+  >
+    Delete
+  </button>
+</div>
                           </td>
                         </tr>
                       );

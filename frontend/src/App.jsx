@@ -36,6 +36,7 @@ import Inventorylist from "./components/inventory/InventoryList";
 import RentalMaster from "./components/rentalMaster/RentalMasterList";
 import RentalMasterForm from "./components/rentalMaster/RentalMasterForm";
 import RentalMasterView from "./components/rentalMaster/RentalMasterView";
+import RentalMasterEdit from "./components/rentalMaster/RentalMatserEdit";
 
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import PublicRoute from "./components/Auth/PublicRoute";
@@ -113,7 +114,16 @@ function App() {
         />
 
         <Route
-          path="/rental-view"
+          path="/rental-edit/:id"
+          element={
+            <ProtectedRoute>
+              <RentalMasterEdit />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/rental-view/:id"
           element={
             <ProtectedRoute>
               <RentalMasterView />
