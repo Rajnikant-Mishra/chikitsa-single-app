@@ -9,7 +9,7 @@
 //   const { id } = useParams(); // Extracts the rental_id from routing path if configured
 //   const location = useLocation();
 //   const navigate = useNavigate();
-  
+
 //   // Fallback pattern to grab ID from either URL parameter match path or location state context flows
 //   const rentalId = id || location.state?.rental_id || location.state?.rental?.rental_id;
 
@@ -28,7 +28,7 @@
 //       try {
 //         setIsLoading(true);
 //         const token = localStorage.getItem("token");
-        
+
 //         const response = await fetch(`${API_BASE_URL}/api/rentals/${rentalId}`, {
 //           method: "GET",
 //           headers: {
@@ -44,7 +44,7 @@
 //         }
 
 //         const result = await response.json();
-        
+
 //         // Match standard API envelope wrapper shapes
 //         if (result.success) {
 //           setRental(result.data);
@@ -114,7 +114,7 @@
 
 //         {/* DETAILS GRID LAYOUT MATRIX */}
 //         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
+
 //           {/* LOGISTICS & DEVICE PROFILE */}
 //           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
 //             <h4 className="text-sm font-extrabold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">
@@ -370,6 +370,35 @@ export default function RentalView() {
   };
 
   // ===============================
+  // Helper: Normalize asset_photos safely
+  // ===============================
+  const getNormalizedPhotos = (photosData) => {
+    if (!photosData) return [];
+    
+    // If it's stored as a JSON string in DB, parse it
+    if (typeof photosData === "string") {
+      try {
+        const parsed = JSON.parse(photosData);
+        return Array.isArray(parsed) ? parsed : [parsed];
+      } catch {
+        return [photosData];
+      }
+    }
+    
+    // If it's already an array
+    if (Array.isArray(photosData)) {
+      return photosData;
+    }
+    
+    // If it's an object with numeric keys or values
+    if (typeof photosData === "object") {
+      return Object.values(photosData);
+    }
+
+    return [];
+  };
+
+  // ===============================
   // Loading State
   // ===============================
   if (isLoading) {
@@ -407,6 +436,9 @@ export default function RentalView() {
       </DashboardLayout>
     );
   }
+
+  // Parse photos safely
+  const photosList = getNormalizedPhotos(rental.asset_photos);
 
   // ===============================
   // MAIN VIEW UI
@@ -587,7 +619,9 @@ export default function RentalView() {
             </h4>
             <div className="space-y-3 text-sm">
               <div className="grid grid-cols-2 border-b border-slate-50 pb-2">
-                <span className="text-slate-400 font-medium">Patient Name:</span>
+                <span className="text-slate-400 font-medium">
+                  Patient Name:
+                </span>
                 <span className="font-bold text-slate-900">
                   {rental.patient_name || "—"}
                 </span>
@@ -660,7 +694,9 @@ export default function RentalView() {
                 </span>
               </div>
               <div className="grid grid-cols-2 border-b border-slate-50 pb-2">
-                <span className="text-slate-400 font-medium">POC / Doctor:</span>
+                <span className="text-slate-400 font-medium">
+                  POC / Doctor:
+                </span>
                 <span className="font-bold text-slate-900">
                   {rental.care_poc_name || "—"}
                 </span>
@@ -696,14 +732,16 @@ export default function RentalView() {
         )}
 
         {/* PHOTOS */}
-        {rental.asset_photos && rental.asset_photos.length > 0 && (
+        {photosList.length > 0 && (
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
             <h4 className="text-sm font-extrabold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">
               📸 Asset Handover Photo Verification
             </h4>
             <div className="flex flex-wrap gap-3">
-              {rental.asset_photos.map((photo, index) => {
+              {photosList.map((photo, index) => {
                 const url = getPhotoUrl(photo);
+                if (!url) return null;
+
                 return (
                   <div
                     key={index}
