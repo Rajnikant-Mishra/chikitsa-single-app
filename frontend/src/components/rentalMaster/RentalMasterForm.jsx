@@ -1146,7 +1146,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../Admin/Layout";
+ import Select from "react-select";
 
+ 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
@@ -1579,7 +1581,7 @@ export default function RentalForm({
                 <label className="block text-sm font-bold text-slate-700 mb-1.5">
                   Select Accessory *
                 </label>
-                <select
+                {/* <select
                   required
                   value={formData?.accessory_id || ""}
                   onChange={(e) => {
@@ -1596,7 +1598,67 @@ export default function RentalForm({
                       {acc.accessory_name}
                     </option>
                   ))}
-                </select>
+                </select> */}
+               
+
+<Select
+  isMulti
+  options={accessories.map((acc) => ({
+    value: acc.accessory_id,
+    label: acc.accessory_name,
+  }))}
+  value={accessories
+    .filter((acc) => formData.accessory_id?.includes(acc.accessory_id))
+    .map((acc) => ({
+      value: acc.accessory_id,
+      label: acc.accessory_name,
+    }))}
+  onChange={(selected) =>
+    setFormData({
+      ...formData,
+      accessory_id: selected ? selected.map((item) => item.value) : [],
+    })
+  }
+  className="w-full"
+  classNamePrefix="react-select"
+  styles={{
+    control: (provided, state) => ({
+      ...provided,
+      minHeight: "50px",
+      borderRadius: "12px",
+      borderColor: state.isFocused ? "#f59e0b" : "#fcd34d", // amber
+      boxShadow: state.isFocused
+        ? "0 0 0 2px rgba(245,158,11,0.2)"
+        : "none",
+      "&:hover": {
+        borderColor: "#f59e0b",
+      },
+      padding: "4px 8px",
+    }),
+    valueContainer: (provided) => ({
+      ...provided,
+      padding: "2px 8px",
+    }),
+    multiValue: (provided) => ({
+      ...provided,
+      backgroundColor: "#fef3c7",
+      borderRadius: "6px",
+    }),
+    multiValueLabel: (provided) => ({
+      ...provided,
+      color: "#92400e",
+      fontWeight: "500",
+    }),
+    multiValueRemove: (provided) => ({
+      ...provided,
+      color: "#92400e",
+      ":hover": {
+        backgroundColor: "#f59e0b",
+        color: "white",
+      },
+    }),
+  }}
+/>
               </div>
 
               <div>

@@ -1,4 +1,3 @@
-
 // import React, { useState, useEffect } from "react";
 // import DashboardLayout from "../Admin/Layout";
 // import { useNavigate } from "react-router-dom";
@@ -1068,9 +1067,9 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                   <thead>
                     <tr className="border-b border-slate-100 text-[11px] font-extrabold text-slate-400 uppercase tracking-widest bg-white">
                       <th className="px-6 py-4 font-bold w-28">Status</th>
-                      <th className="px-6 py-4 font-bold w-28">Deal types</th>
+                      {/* <th className="px-6 py-4 font-bold w-28">Deal types</th>
                       <th className="px-6 py-4 font-bold w-28">Units</th>
-                      <th className="px-6 py-4 font-bold w-28">Modes</th>
+                      <th className="px-6 py-4 font-bold w-28">Modes</th> */}
                       <th className="px-6 py-4 font-bold">Device</th>
                       <th className="px-6 py-4 font-bold">Patients</th>
                       <th className="px-6 py-4 font-bold w-36">Login Date</th>
@@ -1094,7 +1093,7 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                           <td className="px-6 py-4 whitespace-nowrap align-middle">
                             {getStatusBadge(rental.status)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap align-middle">
+                          {/* <td className="px-6 py-4 whitespace-nowrap align-middle">
                             {rental.deal_type || "—"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap align-middle">
@@ -1102,7 +1101,7 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap align-middle">
                             {rental.mode_type || "—"}
-                          </td>
+                          </td> */}
                           <td className="px-6 py-4 font-bold text-[#0e4a67] hover:underline cursor-pointer align-middle">
                             {displayDeviceModel}
                           </td>
@@ -1124,6 +1123,16 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center align-middle">
                             <div className="flex items-center justify-center gap-1.5">
+
+                               {/* NEW: Calculate Days Button */}
+                              <button
+                                type="button"
+                                onClick={() => openCalcModal(rental)}
+                                className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-[11px] rounded transition border border-amber-200"
+                              >
+                                Calc
+                              </button>
+
                               {/* View */}
                               <Link
                                 to={`/rental-view/${rental.rental_id}`}
@@ -1140,14 +1149,7 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                                 Edit
                               </Link>
 
-                              {/* NEW: Calculate Days Button */}
-                              <button
-                                type="button"
-                                onClick={() => openCalcModal(rental)}
-                                className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-[11px] rounded transition border border-amber-200"
-                              >
-                                Calc
-                              </button>
+                             
 
                               {/* Delete */}
                               <button
@@ -1314,9 +1316,7 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                   </span>
                 </p>
                 {!editLogoutDate && modalDays >= 30 && (
-                  <p className="text-xs font-bold text-[#c27803] mt-1">
-                    (Due)
-                  </p>
+                  <p className="text-xs font-bold text-[#c27803] mt-1">(Due)</p>
                 )}
               </div>
             </div>
