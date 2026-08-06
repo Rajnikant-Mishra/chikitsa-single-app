@@ -1,6 +1,8 @@
+
 // import React, { useState, useEffect } from "react";
 // import DashboardLayout from "../Admin/Layout";
 // import { useNavigate } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 // const API_BASE_URL =
 //   import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
@@ -112,28 +114,44 @@
 //     setCurrentPage(1);
 //   };
 
-//   // Dynamic counter for active days on assignment
-//   const calculateTotalDays = (loginDate, status) => {
+//   // Calculate total days from login_date → login_out_date (or today)
+//   // Display format: 30/8  (days / logout month)
+//   const calculateTotalDays = (loginDate, logoutDate, status) => {
 //     if (!loginDate) return "0";
 
 //     const start = new Date(loginDate);
-//     const end = new Date();
+//     const end = logoutDate ? new Date(logoutDate) : new Date();
+
+//     // Difference in days
 //     const diffTime = Math.abs(end - start);
 //     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-//     const upperStatus = (status || "").toUpperCase();
-//     if (
-//       (upperStatus === "ACTIVE" ||
-//         upperStatus === "RUNNING" ||
-//         upperStatus === "DELIVERED" ||
-//         upperStatus === "PENDING") &&
-//       diffDays >= 30
-//     ) {
-//       return (
-//         <span className="text-[#c27803] font-bold">{diffDays}/5 (Due)</span>
-//       );
+//     // Month number of the end date (1-12)
+//     const month = end.getMonth() + 1;
+
+//     // Highlight "Due" only when still running and no logout date yet
+//     if (!logoutDate) {
+//       const upperStatus = (status || "").toUpperCase();
+//       if (
+//         (upperStatus === "ACTIVE" ||
+//           upperStatus === "RUNNING" ||
+//           upperStatus === "DELIVERED" ||
+//           upperStatus === "PENDING") &&
+//         diffDays >= 30
+//       ) {
+//         return (
+//           <span className="text-[#c27803] font-bold">
+//             {diffDays}/{month} (Due)
+//           </span>
+//         );
+//       }
 //     }
-//     return <span className="text-slate-700 font-medium">{diffDays}/5</span>;
+
+//     return (
+//       <span className="text-slate-700 font-medium">
+//         {diffDays}/{month}
+//       </span>
+//     );
 //   };
 
 //   // Standard En-GB Formatter: transforms YYYY-MM-DD to DD-MMM-YYYY (e.g., 16-Jul-2026)
@@ -434,22 +452,19 @@
 //                           <td className="px-6 py-4 font-medium align-middle">
 //                             {calculateTotalDays(
 //                               rental.login_date,
+//                               rental.login_out_date,
 //                               rental.status,
 //                             )}
 //                           </td>
 //                           <td className="px-6 py-4 whitespace-nowrap text-center align-middle">
-//                             <div className="flex items-center justify-center gap-1.5">
-//                               <button
-//                                 type="button"
-//                                 onClick={() =>
-//                                   navigate("/rental-view", {
-//                                     state: { rental },
-//                                   })
-//                                 }
-//                                 className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] rounded transition"
+//                             {/* <div className="flex items-center justify-center gap-1.5">
+//                               <Link
+//                                 to="/rental-view"
+//                                 state={{ rental }}
+//                                 className="inline-block px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] rounded transition"
 //                               >
 //                                 View
-//                               </button>
+//                               </Link>
 //                               <button
 //                                 type="button"
 //                                 onClick={() => onEdit && onEdit(rental)}
@@ -457,6 +472,35 @@
 //                               >
 //                                 Edit
 //                               </button>
+//                               <button
+//                                 type="button"
+//                                 onClick={() =>
+//                                   handleDeleteClick(rental.rental_id)
+//                                 }
+//                                 className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[11px] rounded transition"
+//                               >
+//                                 Delete
+//                               </button>
+//                             </div> */}
+
+//                             <div className="flex items-center justify-center gap-1.5">
+//                               {/* View */}
+//                               <Link
+//                                 to={`/rental-view/${rental.rental_id}`}
+//                                 className="inline-block px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] rounded transition"
+//                               >
+//                                 View
+//                               </Link>
+
+//                               {/* Edit */}
+//                               <Link
+//                                 to={`/rental-edit/${rental.rental_id}`}
+//                                 className="inline-block px-2.5 py-1 bg-[#0e4a67] hover:bg-[#0a384e] text-white font-bold text-[11px] rounded shadow-sm transition"
+//                               >
+//                                 Edit
+//                               </Link>
+
+//                               {/* Delete */}
 //                               <button
 //                                 type="button"
 //                                 onClick={() =>
@@ -551,6 +595,8 @@
 //   );
 // }
 
+
+
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "../Admin/Layout";
 import { useNavigate } from "react-router-dom";
@@ -575,6 +621,12 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
+
+  // ===== NEW: Calculate Days Modal State =====
+  const [calcModalOpen, setCalcModalOpen] = useState(false);
+  const [selectedRental, setSelectedRental] = useState(null);
+  const [editLoginDate, setEditLoginDate] = useState("");
+  const [editLogoutDate, setEditLogoutDate] = useState("");
 
   // Fetch all active/pending rentals array from Express router
   const fetchRentals = async () => {
@@ -706,6 +758,15 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
     );
   };
 
+  // Helper: pure number of days (for modal)
+  const getDaysNumber = (loginDate, logoutDate) => {
+    if (!loginDate) return 0;
+    const start = new Date(loginDate);
+    const end = logoutDate ? new Date(logoutDate) : new Date();
+    const diffTime = Math.abs(end - start);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
   // Standard En-GB Formatter: transforms YYYY-MM-DD to DD-MMM-YYYY (e.g., 16-Jul-2026)
   const formatDisplayDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -723,6 +784,53 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
       }
     }
     return dateString;
+  };
+
+  // Convert any date string to YYYY-MM-DD for <input type="date">
+  const toInputDate = (dateString) => {
+    if (!dateString) return "";
+    // Already YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}/.test(dateString)) {
+      return dateString.slice(0, 10);
+    }
+    const d = new Date(dateString);
+    if (isNaN(d)) return "";
+    return d.toISOString().slice(0, 10);
+  };
+
+  // Open Calculate Modal
+  const openCalcModal = (rental) => {
+    setSelectedRental(rental);
+    setEditLoginDate(toInputDate(rental.login_date));
+    setEditLogoutDate(toInputDate(rental.login_out_date));
+    setCalcModalOpen(true);
+  };
+
+  // Close Calculate Modal
+  const closeCalcModal = () => {
+    setCalcModalOpen(false);
+    setSelectedRental(null);
+    setEditLoginDate("");
+    setEditLogoutDate("");
+  };
+
+  // Apply edited dates to local state
+  const applyDateChanges = () => {
+    if (!selectedRental) return;
+
+    setRentals((prev) =>
+      prev.map((item) =>
+        item.rental_id === selectedRental.rental_id
+          ? {
+              ...item,
+              login_date: editLoginDate || null,
+              login_out_date: editLogoutDate || null,
+            }
+          : item,
+      ),
+    );
+
+    closeCalcModal();
   };
 
   // Unique filter options from data
@@ -808,6 +916,12 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
       </span>
     );
   };
+
+  // Live calculated days inside modal
+  const modalDays = getDaysNumber(editLoginDate, editLogoutDate);
+  const modalMonth = editLogoutDate
+    ? new Date(editLogoutDate).getMonth() + 1
+    : new Date().getMonth() + 1;
 
   return (
     <DashboardLayout>
@@ -962,7 +1076,7 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                       <th className="px-6 py-4 font-bold w-36">Login Date</th>
                       <th className="px-6 py-4 font-bold w-36">Logout Date</th>
                       <th className="px-6 py-4 font-bold w-32">Total Days</th>
-                      <th className="px-6 py-4 font-bold w-48 text-center">
+                      <th className="px-6 py-4 font-bold w-56 text-center">
                         Action
                       </th>
                     </tr>
@@ -1009,21 +1123,33 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                             )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center align-middle">
-                            {/* <div className="flex items-center justify-center gap-1.5">
+                            <div className="flex items-center justify-center gap-1.5">
+                              {/* View */}
                               <Link
-                                to="/rental-view"
-                                state={{ rental }}
+                                to={`/rental-view/${rental.rental_id}`}
                                 className="inline-block px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] rounded transition"
                               >
                                 View
                               </Link>
-                              <button
-                                type="button"
-                                onClick={() => onEdit && onEdit(rental)}
-                                className="px-2.5 py-1 bg-[#0e4a67] hover:bg-[#0a384e] text-white font-bold text-[11px] rounded shadow-sm transition"
+
+                              {/* Edit */}
+                              <Link
+                                to={`/rental-edit/${rental.rental_id}`}
+                                className="inline-block px-2.5 py-1 bg-[#0e4a67] hover:bg-[#0a384e] text-white font-bold text-[11px] rounded shadow-sm transition"
                               >
                                 Edit
+                              </Link>
+
+                              {/* NEW: Calculate Days Button */}
+                              <button
+                                type="button"
+                                onClick={() => openCalcModal(rental)}
+                                className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-[11px] rounded transition border border-amber-200"
+                              >
+                                Calc
                               </button>
+
+                              {/* Delete */}
                               <button
                                 type="button"
                                 onClick={() =>
@@ -1033,34 +1159,7 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
                               >
                                 Delete
                               </button>
-                            </div> */}
-
-                            <div className="flex items-center justify-center gap-1.5">
-  {/* View */}
-  <Link
-    to={`/rental-view/${rental.rental_id}`}
-    className="inline-block px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] rounded transition"
-  >
-    View
-  </Link>
-
-  {/* Edit */}
-  <Link
-    to={`/rental-edit/${rental.rental_id}`}
-    className="inline-block px-2.5 py-1 bg-[#0e4a67] hover:bg-[#0a384e] text-white font-bold text-[11px] rounded shadow-sm transition"
-  >
-    Edit
-  </Link>
-
-  {/* Delete */}
-  <button
-    type="button"
-    onClick={() => handleDeleteClick(rental.rental_id)}
-    className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[11px] rounded transition"
-  >
-    Delete
-  </button>
-</div>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -1141,6 +1240,107 @@ export default function RentalMasterList({ onEdit, onView, onCreateNew }) {
           )}
         </div>
       </div>
+
+      {/* ===================== CALCULATE DAYS MODAL ===================== */}
+      {calcModalOpen && selectedRental && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
+            onClick={closeCalcModal}
+          ></div>
+
+          {/* Modal Box */}
+          <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md border border-slate-200 overflow-hidden">
+            {/* Header */}
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
+              <div>
+                <h3 className="text-sm font-bold text-[#0f172a]">
+                  Calculate Total Days
+                </h3>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  {selectedRental.patient_name || "Patient"} •{" "}
+                  {selectedRental.device?.device_name || "Device"}
+                </p>
+              </div>
+              <button
+                onClick={closeCalcModal}
+                className="w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition text-lg"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-5 space-y-4">
+              {/* Login Date */}
+              <div>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1.5">
+                  Login Date
+                </label>
+                <input
+                  type="date"
+                  value={editLoginDate}
+                  onChange={(e) => setEditLoginDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm text-slate-700 focus:outline-none focus:border-[#0e4a67] focus:ring-1 focus:ring-[#0e4a67]/20"
+                />
+              </div>
+
+              {/* Logout Date */}
+              <div>
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1.5">
+                  Logout Date
+                </label>
+                <input
+                  type="date"
+                  value={editLogoutDate}
+                  onChange={(e) => setEditLogoutDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm text-slate-700 focus:outline-none focus:border-[#0e4a67] focus:ring-1 focus:ring-[#0e4a67]/20"
+                />
+                <p className="text-[10px] text-slate-400 mt-1">
+                  Leave empty to calculate until today
+                </p>
+              </div>
+
+              {/* Result Display */}
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-center">
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                  Total Days
+                </p>
+                <p className="text-2xl font-bold text-[#0e4a67]">
+                  {modalDays}
+                  <span className="text-base font-medium text-slate-500 ml-1">
+                    / {modalMonth}
+                  </span>
+                </p>
+                {!editLogoutDate && modalDays >= 30 && (
+                  <p className="text-xs font-bold text-[#c27803] mt-1">
+                    (Due)
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-5 py-4 border-t border-slate-100 flex items-center justify-end gap-2 bg-slate-50/50">
+              <button
+                type="button"
+                onClick={closeCalcModal}
+                className="px-4 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-md hover:bg-slate-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={applyDateChanges}
+                className="px-4 py-2 text-xs font-bold text-white bg-[#0e4a67] hover:bg-[#0a384e] rounded-md shadow-sm transition"
+              >
+                Apply Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
