@@ -358,47 +358,6 @@ export default function RentalView() {
   }, [rentalId]);
 
   // ===============================
-  // Helper: Safe photo URL
-  // ===============================
-  const getPhotoUrl = (photo) => {
-    if (!photo) return "";
-    const path = typeof photo === "string" ? photo : photo.url || photo;
-    if (!path) return "";
-    if (path.startsWith("http")) return path;
-    if (path.startsWith("/")) return `${API_BASE_URL}${path}`;
-    return `${API_BASE_URL}/uploads/documents/${path}`;
-  };
-
-  // ===============================
-  // Helper: Normalize asset_photos safely
-  // ===============================
-  const getNormalizedPhotos = (photosData) => {
-    if (!photosData) return [];
-    
-    // If it's stored as a JSON string in DB, parse it
-    if (typeof photosData === "string") {
-      try {
-        const parsed = JSON.parse(photosData);
-        return Array.isArray(parsed) ? parsed : [parsed];
-      } catch {
-        return [photosData];
-      }
-    }
-    
-    // If it's already an array
-    if (Array.isArray(photosData)) {
-      return photosData;
-    }
-    
-    // If it's an object with numeric keys or values
-    if (typeof photosData === "object") {
-      return Object.values(photosData);
-    }
-
-    return [];
-  };
-
-  // ===============================
   // Loading State
   // ===============================
   if (isLoading) {
@@ -436,9 +395,6 @@ export default function RentalView() {
       </DashboardLayout>
     );
   }
-
-  // Parse photos safely
-  const photosList = getNormalizedPhotos(rental.asset_photos);
 
   // ===============================
   // MAIN VIEW UI
@@ -728,35 +684,6 @@ export default function RentalView() {
             <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
               {rental.notes}
             </p>
-          </div>
-        )}
-
-        {/* PHOTOS */}
-        {photosList.length > 0 && (
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
-            <h4 className="text-sm font-extrabold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">
-              📸 Asset Handover Photo Verification
-            </h4>
-            <div className="flex flex-wrap gap-3">
-              {photosList.map((photo, index) => {
-                const url = getPhotoUrl(photo);
-                if (!url) return null;
-
-                return (
-                  <div
-                    key={index}
-                    className="w-32 h-24 rounded-xl overflow-hidden border border-slate-200 shadow-inner bg-slate-50 relative group"
-                  >
-                    <img
-                      src={url}
-                      alt={`Handover photo ${index + 1}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition duration-300 cursor-zoom-in"
-                      onClick={() => window.open(url, "_blank")}
-                    />
-                  </div>
-                );
-              })}
-            </div>
           </div>
         )}
       </div>
