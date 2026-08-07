@@ -211,18 +211,20 @@ import {
 // NAVIGATION CONFIGURATION DATA ARRAY (EXACT MATCH)
 // ==========================================
 const NAV_ITEMS = [
+
+  {
+    label: "Dashboard",
+    icon: PlusSquare,
+    path: "/admin-dashboard",
+    group: "WORKSPACE",
+  },
   {
     label: "Rental Master",
     icon: LayoutGrid,
     path: "/rental-master",
     group: "WORKSPACE",
   },
-  // {
-  //   label: "Log New Requisition",
-  //   icon: PlusSquare,
-  //   path: "/rental-master-form",
-  //   group: "WORKSPACE",
-  // },
+  
   {
     label: "Master Info",
     icon: Box,

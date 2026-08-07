@@ -1,283 +1,632 @@
-import React from "react";
-import { motion } from "framer-motion";
-import DashboardLayout from "./Layout";
-import { 
-  ResponsiveContainer, 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  PieChart, 
-  Pie, 
-  Cell,
-  Legend
-} from "recharts";
-import { 
-  GraduationCap, 
-  Users, 
-  Bus, 
-  TrendingUp, 
-  ArrowUpRight, 
-  FileText, 
-  Activity,
-  CheckCircle2,
-  BarChart3,
-  PieChart as PieIcon
-} from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import DashboardLayout from "../Admin/Layout";
 
-const Dashboard = () => {
-  const metricCards = [
-    { title: "Total Student Network", value: "1,248", delta: "+4.2% Growth", icon: GraduationCap, color: "from-[#1e88e5] to-[#1565c0]", bgLight: "bg-blue-500/5" },
-    { title: "Faculty System Nodes", value: "86 Staff", delta: "Fully Active", icon: Users, color: "from-teal-500 to-emerald-600", bgLight: "bg-emerald-500/5" },
-    { title: "Active Transit Fleets", value: "14 / 16", delta: "Live Tracker", icon: Bus, color: "from-amber-500 to-orange-600", bgLight: "bg-amber-500/5" },
-    { title: "Financial Ledger Sync", value: "₹42.8L", delta: "92% Invoiced", icon: TrendingUp, color: "from-[#2865be] to-indigo-700", bgLight: "bg-[#2865be]/5" }
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
+const getToken = () => localStorage.getItem("token");
+
+const headers = () => ({
+  "Content-Type": "application/json",
+  ...(getToken() && { Authorization: `Bearer ${getToken()}` }),
+});
+
+async function safeFetch(url) {
+  try {
+    const res = await fetch(url, { headers: headers() });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return Array.isArray(json) ? json : json?.data || [];
+  } catch {
+    return [];
+  }
+}
+
+function daysBetween(from, to = new Date()) {
+  if (!from) return 0;
+  const start = new Date(from);
+  const end = to instanceof Date ? to : new Date(to);
+  return Math.max(
+    0,
+    Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)),
+  );
+}
+
+function formatDate(d) {
+  if (!d) return "—";
+  const parts = String(d).slice(0, 10).split("-");
+  if (parts[0]?.length === 4) {
+    const date = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+    if (!isNaN(date)) {
+      return date
+        .toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
+        .replace(/ /g, "-");
+    }
+  }
+  return d;
+}
+
+const STATUS_MAP = {
+  Pending: {
+    bg: "bg-amber-50",
+    text: "text-amber-700",
+    border: "border-amber-200",
+    dot: "bg-amber-500",
+  },
+  Delivered: {
+    bg: "bg-sky-50",
+    text: "text-sky-700",
+    border: "border-sky-200",
+    dot: "bg-sky-500",
+  },
+  Running: {
+    bg: "bg-emerald-50",
+    text: "text-emerald-700",
+    border: "border-emerald-200",
+    dot: "bg-emerald-500",
+  },
+  Returned: {
+    bg: "bg-slate-50",
+    text: "text-slate-600",
+    border: "border-slate-200",
+    dot: "bg-slate-400",
+  },
+  Closed: {
+    bg: "bg-slate-100",
+    text: "text-slate-500",
+    border: "border-slate-200",
+    dot: "bg-slate-400",
+  },
+};
+
+function StatusPill({ status }) {
+  const s = STATUS_MAP[status] || STATUS_MAP.Pending;
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide rounded-full border ${s.bg} ${s.text} ${s.border}`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`}></span>
+      {status || "Pending"}
+    </span>
+  );
+}
+
+export default function AdminDashboard() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [rentals, setRentals] = useState([]);
+  const [devices, setDevices] = useState([]);
+  const [accessories, setAccessories] = useState([]);
+  const [careCenters, setCareCenters] = useState([]);
+  const [references, setReferences] = useState([]);
+  const [deliveryExecs, setDeliveryExecs] = useState([]);
+
+  const loadAll = useCallback(async () => {
+    setLoading(true);
+    const [r, d, a, c, ref, del] = await Promise.all([
+      safeFetch(`${API_BASE_URL}/api/rentals`),
+      safeFetch(`${API_BASE_URL}/api/devices`),
+      safeFetch(`${API_BASE_URL}/api/accessori`),
+      safeFetch(`${API_BASE_URL}/api/carecenters`),
+      safeFetch(`${API_BASE_URL}/api/references`),
+      safeFetch(`${API_BASE_URL}/api/delivery-executives`),
+    ]);
+    setRentals(r);
+    setDevices(d);
+    setAccessories(a);
+    setCareCenters(c);
+    setReferences(ref);
+    setDeliveryExecs(del);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadAll();
+  }, [loadAll]);
+
+  // ——— KPI calculations ———
+  const totalRentals = rentals.length;
+  const pending = rentals.filter((r) => r.status === "Pending").length;
+  const running = rentals.filter(
+    (r) => r.status === "Running" || r.status === "Delivered",
+  ).length;
+  const returned = rentals.filter(
+    (r) => r.status === "Returned" || r.status === "Closed",
+  ).length;
+  const dueSoon = rentals.filter((r) => {
+    if (r.login_out_date) return false;
+    const days = daysBetween(r.login_date);
+    return (
+      days >= 25 &&
+      ["Pending", "Delivered", "Running"].includes(r.status || "Pending")
+    );
+  }).length;
+
+  const activeDevices = devices.filter((d) => d.status === "active").length;
+  const activeAccessories = accessories.filter(
+    (a) => a.status === "active",
+  ).length;
+  const activeCenters = careCenters.filter((c) => c.status === "active").length;
+  const activeRefs = references.filter((r) => r.status === "active").length;
+  const activeDelivery = deliveryExecs.filter(
+    (d) => d.status === "active",
+  ).length;
+
+  const recentRentals = [...rentals]
+    .sort((a, b) => (b.rental_id || 0) - (a.rental_id || 0))
+    .slice(0, 8);
+
+  const dueList = rentals
+    .filter((r) => {
+      if (r.login_out_date) return false;
+      const days = daysBetween(r.login_date);
+      return (
+        days >= 25 &&
+        ["Pending", "Delivered", "Running"].includes(r.status || "Pending")
+      );
+    })
+    .sort((a, b) => daysBetween(b.login_date) - daysBetween(a.login_date))
+    .slice(0, 5);
+
+  const dealBreakdown = {
+    B2B: rentals.filter((r) => r.deal_type === "B2B").length,
+    B2C: rentals.filter((r) => r.deal_type === "B2C").length,
+  };
+  const modeBreakdown = {
+    Prepaid: rentals.filter((r) => r.mode_type === "Prepaid").length,
+    Postpaid: rentals.filter((r) => r.mode_type === "Postpaid").length,
+  };
+
+  const kpis = [
+    {
+      label: "Total Rentals",
+      value: totalRentals,
+      sub: "All time",
+      icon: "📋",
+      color: "from-[#0e4a67] to-[#155e82]",
+      shadow: "shadow-[#0e4a67]/20",
+    },
+    {
+      label: "Active / Running",
+      value: running,
+      sub: "In field",
+      icon: "🟢",
+      color: "from-emerald-600 to-emerald-500",
+      shadow: "shadow-emerald-500/20",
+    },
+    {
+      label: "Pending",
+      value: pending,
+      sub: "Awaiting deploy",
+      icon: "⏳",
+      color: "from-amber-500 to-amber-400",
+      shadow: "shadow-amber-500/20",
+    },
+    {
+      label: "Due Alert",
+      value: dueSoon,
+      sub: "≥ 25 days open",
+      icon: "⚠️",
+      color: "from-rose-500 to-rose-400",
+      shadow: "shadow-rose-500/20",
+    },
   ];
 
-  // Professional Multi-month Financial Streams Dataset
-  const revenueTrendData = [
-    { name: "Jan", Invoiced: 2.8, Collected: 2.1 },
-    { name: "Feb", Invoiced: 3.4, Collected: 2.9 },
-    { name: "Mar", Invoiced: 4.2, Collected: 3.8 },
-    { name: "Apr", Invoiced: 4.8, Collected: 4.0 },
-    { name: "May", Invoiced: 5.6, Collected: 4.9 },
-    { name: "Jun", Invoiced: 6.2, Collected: 5.8 }
+  const modules = [
+    {
+      title: "Devices",
+      count: activeDevices,
+      total: devices.length,
+      path: "/inventory", // adjust to your route
+      icon: "🖥️",
+      tint: "bg-sky-50 text-sky-700 border-sky-100",
+    },
+    {
+      title: "Accessories",
+      count: activeAccessories,
+      total: accessories.length,
+      path: "/inventory",
+      icon: "📦",
+      tint: "bg-violet-50 text-violet-700 border-violet-100",
+    },
+    {
+      title: "Care Centers",
+      count: activeCenters,
+      total: careCenters.length,
+      path: "/inventory",
+      icon: "🏥",
+      tint: "bg-teal-50 text-teal-700 border-teal-100",
+    },
+    {
+      title: "References",
+      count: activeRefs,
+      total: references.length,
+      path: "/inventory",
+      icon: "👨‍⚕️",
+      tint: "bg-indigo-50 text-indigo-700 border-indigo-100",
+    },
+    {
+      title: "Delivery Execs",
+      count: activeDelivery,
+      total: deliveryExecs.length,
+      path: "/inventory",
+      icon: "🚴",
+      tint: "bg-orange-50 text-orange-700 border-orange-100",
+    },
   ];
 
-  // Dynamic Distribution Breakdown
-  const distributionData = [
-    { name: "Students", value: 500, color: "#2865be" },
-    { name: "Academic Faculty", value: 500, color: "#10b981" },
-    { name: "Logistics Personnel", value: 444, color: "#f59e0b" }
+  const quickActions = [
+    {
+      label: "New Requisition",
+      path: "/rental-requisition",
+      icon: "➕",
+      primary: true,
+    },
+    {
+      label: "Rental Master",
+      path: "/rental-master",
+      icon: "📑",
+    },
+    {
+      label: "Inventory Ledger",
+      path: "/inventory",
+      icon: "📋",
+    },
   ];
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+          <div className="w-10 h-10 border-[3px] border-t-transparent border-[#0e4a67] rounded-full animate-spin"></div>
+          <p className="text-sm font-medium text-slate-400">
+            Loading dashboard…
+          </p>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
-    <DashboardLayout title="System Overview Core">
-      
-      {/* Metric Cards Matrix */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-        {metricCards.map((card, idx) => {
-          const Icon = card.icon;
-          return (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05 }}
-              className="bg-white border border-slate-100/80 rounded-2xl p-6 shadow-[0_15px_40px_-10px_rgba(15,23,42,0.04)] flex flex-col justify-between relative group overflow-hidden"
+    <DashboardLayout>
+      <div className="w-full max-w-[1400px] mx-auto space-y-6 pb-8">
+        {/* ========== HEADER ========== */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-[26px] font-extrabold text-slate-900 tracking-tight">
+              Operations Dashboard
+            </h1>
+            <p className="text-slate-400 text-sm mt-0.5 font-medium">
+              Live overview of rentals, assets & logistics
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {quickActions.map((a) => (
+              <button
+                key={a.path}
+                onClick={() => navigate(a.path)}
+                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition active:scale-[0.98] ${
+                  a.primary
+                    ? "bg-[#0e4a67] hover:bg-[#125c80] text-white shadow-md shadow-[#0e4a67]/25"
+                    : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm"
+                }`}
+              >
+                <span>{a.icon}</span>
+                {a.label}
+              </button>
+            ))}
+            <button
+              onClick={loadAll}
+              className="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-[#0e4a67] hover:bg-slate-50 transition shadow-sm"
+              title="Refresh"
             >
-              <div className={`absolute top-0 right-0 w-20 h-20 rounded-bl-[30px] transition-all duration-300 ${card.bgLight}`} />
-              
-              <div className="flex items-center justify-between relative z-10">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
-                  {card.title}
+              ↻
+            </button>
+          </div>
+        </div>
+
+        {/* ========== KPI CARDS ========== */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {kpis.map((k) => (
+            <div
+              key={k.label}
+              className="relative overflow-hidden bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 group hover:shadow-md transition"
+            >
+              <div
+                className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${k.color} opacity-[0.07] rounded-bl-[80px]`}
+              ></div>
+              <div className="flex items-start justify-between mb-3">
+                <span className="text-2xl">{k.icon}</span>
+                <span
+                  className={`text-[10px] font-bold uppercase tracking-wider text-slate-400`}
+                >
+                  {k.sub}
                 </span>
-                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${card.color} text-white shadow-sm`}>
-                  <Icon size={16} />
-                </div>
               </div>
+              <p className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                {k.value}
+              </p>
+              <p className="text-sm font-semibold text-slate-500 mt-1">
+                {k.label}
+              </p>
+            </div>
+          ))}
+        </div>
 
-              <div className="mt-5 flex items-end justify-between relative z-10">
-                <div>
-                  <p className="text-2xl font-black text-slate-900 tracking-tight leading-none">
-                    {card.value}
-                  </p>
-                  <span className="inline-flex items-center gap-1 text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100/50 mt-2">
-                    {card.delta}
+        {/* ========== MIDDLE ROW: Modules + Breakdown ========== */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {/* Inventory modules */}
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h2 className="text-sm font-extrabold text-slate-800 tracking-tight">
+                Inventory Modules
+              </h2>
+              <Link
+                to="/inventory"
+                className="text-xs font-bold text-[#0e4a67] hover:underline"
+              >
+                Manage →
+              </Link>
+            </div>
+            <div className="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {modules.map((m) => (
+                <button
+                  key={m.title}
+                  onClick={() => navigate(m.path)}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border ${m.tint} hover:scale-[1.02] active:scale-[0.98] transition text-center`}
+                >
+                  <span className="text-2xl">{m.icon}</span>
+                  <span className="text-xs font-bold leading-tight">
+                    {m.title}
                   </span>
-                </div>
-                <button className="p-1.5 rounded-lg bg-slate-50 text-slate-400 hover:text-[#2865be] hover:bg-[#2865be]/5 transition-all">
-                  <ArrowUpRight size={14} />
-                </button>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* Advanced Analytic Visualization Matrix Layer */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        
-        {/* Analytics Graph Card: Premium Smooth Area Chart (2/3 Split View) */}
-        <div className="lg:col-span-2 bg-white border border-slate-100/80 rounded-3xl p-6 shadow-[0_20px_50px_-15px_rgba(15,23,42,0.03)] flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between pb-4 border-b border-slate-50 mb-6">
-              <div>
-                <h3 className="text-sm font-black text-slate-900 tracking-wider uppercase flex items-center gap-2">
-                  <BarChart3 size={16} className="text-[#2865be]" /> Fee Revenue Index Array
-                </h3>
-                <p className="text-[11px] text-slate-400 font-medium">Comparative collection data metrics (Values in Lakhs)</p>
-              </div>
-            </div>
-
-            {/* Recharts High-End Graphic Engine Box */}
-            <div className="w-full h-64 text-xs font-semibold pr-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={revenueTrendData} margin={{ top: 10, right: 5, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorInvoiced" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#2865be" stopOpacity={0.2}/>
-                      <stop offset="90%" stopColor="#2865be" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="colorCollected" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                  <XAxis dataKey="name" stroke="#94a3b8" tickLine={false} axisLine={false} dy={10} />
-                  <YAxis stroke="#94a3b8" tickLine={false} axisLine={false} dx={-5} />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: "#ffffff", borderRadius: "12px", border: "1px solid #f1f5f9", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.05)" }}
-                    itemStyle={{ fontWeight: "700", fontSize: "11px" }}
-                  />
-                  <Area type="monotone" dataKey="Invoiced" stroke="#2865be" strokeWidth={2.5} fillOpacity={1} fill="url(#colorInvoiced)" />
-                  <Area type="monotone" dataKey="Collected" stroke="#10b981" strokeWidth={2.5} fillOpacity={1} fill="url(#colorCollected)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* Analytics Distribution Interactive Donut Ring (1/3 Split View) */}
-        <div className="bg-white border border-slate-100/80 rounded-3xl p-6 shadow-[0_20px_50px_-15px_rgba(15,23,42,0.03)] flex flex-col justify-between">
-          <div>
-            <div className="pb-4 border-b border-slate-50 mb-4">
-              <h3 className="text-sm font-black text-slate-900 tracking-wider uppercase flex items-center gap-2">
-                <PieIcon size={16} className="text-[#2865be]" /> Distribution Ratios
-              </h3>
-              <p className="text-[11px] text-slate-400 font-medium">System cluster volume metrics</p>
-            </div>
-
-            {/* Recharts Clean Geometric Donut Area */}
-            <div className="w-full h-48 flex justify-center items-center relative">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={distributionData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={75}
-                    paddingAngle={4}
-                    dataKey="value"
-                  >
-                    {distributionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #f1f5f9" }}
-                    itemStyle={{ fontSize: "11px", fontWeight: "bold" }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute text-center pointer-events-none">
-                <p className="text-xl font-black text-slate-800 tracking-tight">1,368</p>
-                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Total Active</p>
-              </div>
-            </div>
-
-            {/* Custom Interactive Legend Indicators */}
-            <div className="space-y-2 mt-2">
-              {distributionData.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-2 rounded-xl bg-slate-50/60 border border-slate-100/40">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-md" style={{ backgroundColor: item.color }} />
-                    <span className="text-[11px] font-bold text-slate-600">{item.name}</span>
-                  </div>
-                  <span className="text-[11px] font-black text-slate-800">{item.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      {/* Main Structural Twin Dashboard Layout Blocks */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Real-time Tracking Feeds (2/3 Split View) */}
-        <div className="lg:col-span-2 bg-white border border-slate-100/80 rounded-3xl p-6 shadow-[0_20px_50px_-15px_rgba(15,23,42,0.03)] flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
-              <div>
-                <h3 className="text-sm font-black text-slate-900 tracking-wider uppercase">Active Pipeline Log</h3>
-                <p className="text-[11px] text-slate-400 font-medium">Real-time infrastructure system entries</p>
-              </div>
-              <span className="text-[9px] font-black px-2.5 py-1 bg-blue-50 text-[#2865be] rounded-lg border border-blue-100 uppercase tracking-wider flex items-center gap-1">
-                <Activity size={12} className="animate-pulse" /> Live Node Stream
-              </span>
-            </div>
-
-            <div className="space-y-3.5">
-              {[
-                { entity: "Transit Route Array #04", detail: "Assigned vehicle reached Sector 3 Terminal Gate Node", status: "In Route", time: "Just Now", color: "text-amber-600 bg-amber-50 border-amber-100" },
-                { entity: "Core Financial Ledger", detail: "Synchronized invoices and salary tables for administrative staff", status: "Verified", time: "8 mins ago", color: "text-emerald-600 bg-emerald-50 border-emerald-100" },
-                { entity: "System Security Node", detail: "Cleared verification certificates for new registrar profiles", status: "Committed", time: "1 hr ago", color: "text-blue-600 bg-blue-50 border-blue-100" }
-              ].map((log, i) => (
-                <div key={i} className="flex items-start justify-between p-4 rounded-xl bg-slate-50/70 border border-slate-100/60 transition-all hover:bg-white hover:shadow-md hover:shadow-slate-100">
-                  <div className="flex items-start gap-3.5">
-                    <div className="p-2 rounded-xl bg-white border border-slate-100 shadow-sm text-slate-400 mt-0.5">
-                      <FileText size={14} />
-                    </div>
-                    <div>
-                      <p className="text-xs font-black text-slate-800">{log.entity}</p>
-                      <p className="text-xs text-slate-500 font-medium mt-0.5">{log.detail}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className={`text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded border ${log.color}`}>
-                      {log.status}
-                    </span>
-                    <p className="text-[10px] text-slate-400 font-bold mt-1.5">{log.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <button className="w-full text-center py-3 border-2 border-dashed border-slate-200 text-slate-400 hover:text-[#2865be] hover:border-[#2865be]/60 font-bold text-xs uppercase tracking-widest rounded-xl transition-all mt-6">
-            Access Command Logging Matrix
-          </button>
-        </div>
-
-        {/* Action Panel Matrix (1/3 Split View) */}
-        <div className="bg-white border border-slate-100/80 rounded-3xl p-6 shadow-[0_20px_50px_-15px_rgba(15,23,42,0.03)] flex flex-col justify-between">
-          <div>
-            <div className="pb-4 border-b border-slate-100 mb-6">
-              <h3 className="text-sm font-black text-slate-900 tracking-wider uppercase">Administrative Core Actions</h3>
-              <p className="text-[11px] text-slate-400 font-medium">Deploy standard infrastructure utilities</p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-2.5">
-              {[
-                { label: "Provision Student Account", desc: "Create secure institutional access profile" },
-                { label: "Dispatch Fleet Notification", desc: "Push emergency updates to transit paths" },
-                { label: "Export Transaction Matrix", desc: "Compile collected revenue rows into structured data" }
-              ].map((action, i) => (
-                <button key={i} className="w-full text-left p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 hover:border-[#2865be]/30 hover:bg-[#2865be]/5 transition-all group flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-black text-slate-800 group-hover:text-[#2865be] transition-colors">{action.label}</p>
-                    <p className="text-[10px] text-slate-400 font-medium mt-0.5">{action.desc}</p>
-                  </div>
-                  <CheckCircle2 size={14} className="text-slate-200 group-hover:text-[#2865be] transition-colors shrink-0 ml-2" />
+                  <span className="text-lg font-extrabold">{m.count}</span>
+                  <span className="text-[10px] opacity-70">
+                    of {m.total} total
+                  </span>
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#2865be]/5 to-transparent border border-[#2865be]/10 text-center mt-6">
-            <p className="text-[10px] font-black text-[#2865be] uppercase tracking-widest mb-0.5">Core Secure Node</p>
-            <p className="text-xs text-slate-400 font-semibold">shikshaOne Cluster Deployment Active</p>
+          {/* Deal / Mode breakdown */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100">
+              <h2 className="text-sm font-extrabold text-slate-800 tracking-tight">
+                Deal & Mode Mix
+              </h2>
+            </div>
+            <div className="p-5 space-y-5">
+              {/* Deal */}
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                  Deal Type
+                </p>
+                <div className="space-y-2">
+                  {["B2B", "B2C"].map((key) => {
+                    const val = dealBreakdown[key] || 0;
+                    const pct =
+                      totalRentals > 0
+                        ? Math.round((val / totalRentals) * 100)
+                        : 0;
+                    return (
+                      <div key={key}>
+                        <div className="flex justify-between text-xs font-semibold mb-1">
+                          <span className="text-slate-600">{key}</span>
+                          <span className="text-slate-800">
+                            {val} · {pct}%
+                          </span>
+                        </div>
+                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-[#0e4a67] transition-all"
+                            style={{ width: `${pct}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              {/* Mode */}
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                  Billing Mode
+                </p>
+                <div className="space-y-2">
+                  {["Prepaid", "Postpaid"].map((key) => {
+                    const val = modeBreakdown[key] || 0;
+                    const pct =
+                      totalRentals > 0
+                        ? Math.round((val / totalRentals) * 100)
+                        : 0;
+                    return (
+                      <div key={key}>
+                        <div className="flex justify-between text-xs font-semibold mb-1">
+                          <span className="text-slate-600">{key}</span>
+                          <span className="text-slate-800">
+                            {val} · {pct}%
+                          </span>
+                        </div>
+                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${
+                              key === "Prepaid"
+                                ? "bg-amber-500"
+                                : "bg-emerald-500"
+                            }`}
+                            style={{ width: `${pct}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              {/* Returned */}
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-500">
+                  Returned / Closed
+                </span>
+                <span className="text-sm font-extrabold text-slate-800">
+                  {returned}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
+        {/* ========== BOTTOM ROW: Recent + Due ========== */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+          {/* Recent rentals */}
+          <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h2 className="text-sm font-extrabold text-slate-800 tracking-tight">
+                Recent Requisitions
+              </h2>
+              <Link
+                to="/rental-master"
+                className="text-xs font-bold text-[#0e4a67] hover:underline"
+              >
+                View all →
+              </Link>
+            </div>
+            {recentRentals.length === 0 ? (
+              <div className="py-16 text-center text-slate-400 text-sm">
+                No rentals yet
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400 border-b border-slate-50">
+                      <th className="px-5 py-3">Patient</th>
+                      <th className="px-5 py-3">Device</th>
+                      <th className="px-5 py-3">Login</th>
+                      <th className="px-5 py-3">Status</th>
+                      <th className="px-5 py-3 text-right">Days</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {recentRentals.map((r) => {
+                      const days = daysBetween(r.login_date, r.login_out_date);
+                      return (
+                        <tr
+                          key={r.rental_id}
+                          className="hover:bg-slate-50/70 transition cursor-pointer"
+                          onClick={() =>
+                            navigate(`/rental-view/${r.rental_id}`)
+                          }
+                        >
+                          <td className="px-5 py-3.5">
+                            <p className="text-sm font-bold text-slate-800 truncate max-w-[140px]">
+                              {r.patient_name || "—"}
+                            </p>
+                            <p className="text-[11px] text-slate-400 font-medium">
+                              {r.deal_type || "—"} · {r.mode_type || "—"}
+                            </p>
+                          </td>
+                          <td className="px-5 py-3.5 text-sm font-semibold text-[#0e4a67]">
+                            {r.device?.device_name || "—"}
+                          </td>
+                          <td className="px-5 py-3.5 text-xs font-medium text-slate-500 whitespace-nowrap">
+                            {formatDate(r.login_date)}
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <StatusPill status={r.status} />
+                          </td>
+                          <td className="px-5 py-3.5 text-right">
+                            <span
+                              className={`text-sm font-bold ${
+                                !r.login_out_date && days >= 30
+                                  ? "text-amber-600"
+                                  : "text-slate-700"
+                              }`}
+                            >
+                              {days}
+                              {!r.login_out_date && days >= 30 ? " ⚠" : ""}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Due / Attention list */}
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-amber-50/80 to-white">
+              <div className="flex items-center gap-2">
+                <span className="text-base">⚠️</span>
+                <h2 className="text-sm font-extrabold text-slate-800 tracking-tight">
+                  Needs Attention
+                </h2>
+              </div>
+              {dueList.length > 0 && (
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+                  {dueList.length}
+                </span>
+              )}
+            </div>
+            {dueList.length === 0 ? (
+              <div className="py-14 text-center">
+                <p className="text-2xl mb-2 opacity-50">✅</p>
+                <p className="text-sm text-slate-400 font-medium">
+                  Nothing overdue
+                </p>
+              </div>
+            ) : (
+              <ul className="divide-y divide-slate-50">
+                {dueList.map((r) => {
+                  const days = daysBetween(r.login_date);
+                  return (
+                    <li
+                      key={r.rental_id}
+                      onClick={() => navigate(`/rental-view/${r.rental_id}`)}
+                      className="px-5 py-3.5 hover:bg-amber-50/40 cursor-pointer transition flex items-center gap-3"
+                    >
+                      <div
+                        className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-extrabold ${
+                          days >= 30
+                            ? "bg-rose-100 text-rose-700"
+                            : "bg-amber-100 text-amber-700"
+                        }`}
+                      >
+                        {days}d
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-bold text-slate-800 truncate">
+                          {r.patient_name || "Patient"}
+                        </p>
+                        <p className="text-[11px] text-slate-400 truncate">
+                          {r.device?.device_name || "Device"} · since{" "}
+                          {formatDate(r.login_date)}
+                        </p>
+                      </div>
+                      <StatusPill status={r.status} />
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            <div className="px-5 py-3 border-t border-slate-100 bg-slate-50/50">
+              <Link
+                to="/rental-master"
+                className="text-xs font-bold text-[#0e4a67] hover:underline"
+              >
+                Open Rental Master →
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </DashboardLayout>
   );
-};
-
-export default Dashboard;
+}
