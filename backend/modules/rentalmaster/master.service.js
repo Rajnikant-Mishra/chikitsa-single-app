@@ -8,9 +8,13 @@ class RentalService {
   }
 
   // Get All Rentals
-  async getAllRentals() {
-    return await rentalRepository.findAll();
-  }
+  // async getAllRentals() {
+  //   return await rentalRepository.findAll();
+  // }
+
+  async getAllRentals(filters) {
+  return await rentalRepository.findAll(filters);
+}
 
   
   // Get Rental By ID

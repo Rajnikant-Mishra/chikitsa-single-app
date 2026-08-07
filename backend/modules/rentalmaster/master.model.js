@@ -10,8 +10,6 @@
 //       primaryKey: true,
 //     },
 
-
-
 //     device_id: {
 //       type: DataTypes.INTEGER,
 //       allowNull: false,
@@ -40,6 +38,24 @@
 
 //     recall_date: {
 //       type: DataTypes.DATEONLY,
+//       allowNull: true,
+//     },
+
+//     // NEW COLUMN
+//     deal_type: {
+//       type: DataTypes.STRING(20),
+//       allowNull: true,
+//     },
+
+//     // NEW COLUMN
+//     unit_type: {
+//       type: DataTypes.STRING(20),
+//       allowNull: true,
+//     },
+
+//     // NEW COLUMN
+//     mode_type: {
+//       type: DataTypes.STRING(20),
 //       allowNull: true,
 //     },
 
@@ -184,6 +200,13 @@ const Rental = sequelize.define(
       onDelete: "RESTRICT",
     },
 
+    // NEW – multi accessory support
+    accessory_id: {
+      type: DataTypes.JSON,          // stores array of accessory IDs e.g. [1, 5, 12]
+      allowNull: true,
+      defaultValue: [],
+    },
+
     record_date: {
       type: DataTypes.DATEONLY,
       allowNull: true,
@@ -192,6 +215,11 @@ const Rental = sequelize.define(
     login_date: {
       type: DataTypes.DATEONLY,
       allowNull: false,
+    },
+
+    notify_date: {                   // NEW
+      type: DataTypes.DATEONLY,
+      allowNull: true,
     },
 
     login_out_date: {
@@ -204,20 +232,16 @@ const Rental = sequelize.define(
       allowNull: true,
     },
 
-    // NEW COLUMN
     deal_type: {
       type: DataTypes.STRING(20),
       allowNull: true,
-
     },
 
-    // NEW COLUMN
     unit_type: {
       type: DataTypes.STRING(20),
       allowNull: true,
     },
 
-    // NEW COLUMN
     mode_type: {
       type: DataTypes.STRING(20),
       allowNull: true,
@@ -314,6 +338,11 @@ const Rental = sequelize.define(
       allowNull: true,
     },
 
+    notes: {                         // NEW
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
     asset_photos: {
       type: DataTypes.JSON,
       allowNull: true,
@@ -326,7 +355,7 @@ const Rental = sequelize.define(
         "Delivered",
         "Running",
         "Returned",
-        "Closed"
+        "Closed",
       ),
       defaultValue: "Pending",
     },
@@ -335,7 +364,7 @@ const Rental = sequelize.define(
     tableName: "rental_master",
     timestamps: true,
     underscored: true,
-  }
+  },
 );
 
 export default Rental;

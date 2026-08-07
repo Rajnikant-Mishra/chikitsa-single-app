@@ -5,9 +5,7 @@ import rentalService from "../rentalmaster/master.service.js";
 // Make sure this matches your exact upload storage path
 const uploadPath = path.join(process.cwd(), "uploads", "documents");
 
-// ===============================
 // CREATE RENTAL
-// ===============================
 export const createRental = async (req, res) => {
   try {
     let assetPhotos = [];
@@ -19,7 +17,9 @@ export const createRental = async (req, res) => {
     const rentalData = {
       ...req.body,
       // Ensure numeric IDs don't get stuck as empty strings
-      care_center_id: req.body.care_center_id ? Number(req.body.care_center_id) : null,
+      care_center_id: req.body.care_center_id
+        ? Number(req.body.care_center_id)
+        : null,
       device_id: req.body.device_id ? Number(req.body.device_id) : null,
       asset_photos: assetPhotos,
     };
@@ -39,12 +39,27 @@ export const createRental = async (req, res) => {
   }
 };
 
-// ===============================
 // GET ALL RENTALS
-// ===============================
+// export const getAllRentals = async (req, res) => {
+//   try {
+//     const rentals = await rentalService.getAllRentals();
+
+//     return res.status(200).json({
+//       success: true,
+//       count: rentals.length,
+//       data: rentals,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
+
 export const getAllRentals = async (req, res) => {
   try {
-    const rentals = await rentalService.getAllRentals();
+    const rentals = await rentalService.getAllRentals(req.query);
 
     return res.status(200).json({
       success: true,
@@ -59,9 +74,7 @@ export const getAllRentals = async (req, res) => {
   }
 };
 
-// ===============================
 // GET RENTAL BY ID
-// ===============================
 export const getRentalById = async (req, res) => {
   try {
     const rental = await rentalService.getRentalById(req.params.id);
@@ -78,9 +91,7 @@ export const getRentalById = async (req, res) => {
   }
 };
 
-// ===============================
 // UPDATE RENTAL
-// ===============================
 export const updateRental = async (req, res) => {
   try {
     const rental = await rentalService.getRentalById(req.params.id);
@@ -112,14 +123,16 @@ export const updateRental = async (req, res) => {
 
     const updateData = {
       ...req.body,
-      care_center_id: req.body.care_center_id ? Number(req.body.care_center_id) : null,
+      care_center_id: req.body.care_center_id
+        ? Number(req.body.care_center_id)
+        : null,
       device_id: req.body.device_id ? Number(req.body.device_id) : null,
       asset_photos: assetPhotos,
     };
 
     const updatedRental = await rentalService.updateRental(
       req.params.id,
-      updateData
+      updateData,
     );
 
     return res.status(200).json({
@@ -135,9 +148,7 @@ export const updateRental = async (req, res) => {
   }
 };
 
-// ===============================
 // DELETE RENTAL
-// ===============================
 export const deleteRental = async (req, res) => {
   try {
     const rental = await rentalService.getRentalById(req.params.id);
